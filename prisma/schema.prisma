@@ -1,0 +1,197 @@
+model faqs {
+  id                Int                @id @default(autoincrement())
+  is_active         Boolean            @default(true)
+  order             Int                @default(0)
+  created_at        DateTime           @default(now())
+  updated_at        DateTime           @updatedAt
+  faq_translations  faq_translations[]
+
+  @@index([is_active])
+  @@index([order])
+}
+
+model faq_translations {
+  id         Int      @id @default(autoincrement())
+  faq_id     Int
+  locale     String   @db.VarChar(10)
+  question   String
+  answer     String   @db.Text
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  faqs       faqs     @relation(fields: [faq_id], references: [id], onDelete: Cascade)
+
+  @@unique([faq_id, locale])
+  @@index([locale])
+}
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model accounts {
+  id                  Int     @id @default(autoincrement())
+  user_id             Int
+  type                String
+  provider            String
+  provider_account_id String
+  refresh_token       String?
+  access_token        String?
+  expires_at          Int?
+  token_type          String?
+  scope               String?
+  id_token            String?
+  session_state       String?
+  users               users   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([provider, provider_account_id])
+}
+
+model membership_levels {
+  id            Int           @id @default(autoincrement())
+  name          String        @unique
+  priority      Int           @unique
+  price         Decimal       @db.Decimal(10, 2)
+  duration_days Int
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
+  slug          String        @unique
+  memberships   memberships[]
+}
+
+model memberships {
+  id                  Int               @id @default(autoincrement())
+  user_id             Int
+  membership_level_id Int
+  start_date          DateTime
+  end_date            DateTime
+  status              MembershipStatus  @default(ACTIVE)
+  created_at          DateTime          @default(now())
+  updated_at          DateTime          @updatedAt
+  membership_levels   membership_levels @relation(fields: [membership_level_id], references: [id])
+  users               users             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([user_id])
+}
+
+model permissions {
+  id               Int                @id @default(autoincrement())
+  name             String             @unique
+  slug             String             @unique
+  created_at       DateTime           @default(now())
+  updated_at       DateTime           @updatedAt
+  role_permissions role_permissions[]
+}
+
+model role_permissions {
+  role_id       Int
+  permission_id Int
+  permissions   permissions @relation(fields: [permission_id], references: [id], onDelete: Cascade)
+  roles         roles       @relation(fields: [role_id], references: [id], onDelete: Cascade)
+
+  @@id([role_id, permission_id])
+}
+
+model roles {
+  id               Int                @id @default(autoincrement())
+  name             String             @unique
+  slug             String             @unique
+  created_at       DateTime           @default(now())
+  updated_at       DateTime           @updatedAt
+  role_permissions role_permissions[]
+  user_roles       user_roles[]
+}
+
+model sessions {
+  id            Int      @id @default(autoincrement())
+  session_token String   @unique
+  user_id       Int
+  expires       DateTime
+  users         users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model user_roles {
+  user_id    Int
+  role_id    Int
+  created_at DateTime @default(now())
+  roles      roles    @relation(fields: [role_id], references: [id], onDelete: Cascade)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, role_id])
+}
+
+model users {
+  id                Int           @id @default(autoincrement())
+  public_id         String        @unique @default(uuid())
+  email             String        @unique
+  name              String?
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+  password          String?
+  provider          AuthProvider  @default(EMAIL)
+  status            UserStatus    @default(ACTIVE)
+  email_verified    DateTime?
+  image             String?
+  is_reset_password Boolean       @default(false)
+  accounts          accounts[]
+  memberships       memberships[]
+  sessions          sessions[]
+  user_roles        user_roles[]
+}
+
+model services {
+  id                    Int                     @id @default(autoincrement())
+  image_url             String?
+  is_active             Boolean                 @default(true)
+  order                 Int                     @default(0)
+  created_at            DateTime                @default(now())
+  updated_at            DateTime                @updatedAt
+  service_translations  service_translations[]
+
+  @@index([is_active])
+  @@index([order])
+}
+
+model service_translations {
+  id          Int      @id @default(autoincrement())
+  service_id  Int
+  locale      String   @db.VarChar(10)
+  title       String
+  description String   @db.Text
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  services    services @relation(fields: [service_id], references: [id], onDelete: Cascade)
+
+  @@unique([service_id, locale])
+  @@index([locale])
+}
+
+model verification_tokens {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+enum AuthProvider {
+  EMAIL
+  GOOGLE
+  FACEBOOK
+  APPLE
+}
+
+enum MembershipStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}

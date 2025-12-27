@@ -1,0 +1,400 @@
+{
+  "HomePage": {
+    "title": "開始編輯 page.tsx 檔案。",
+    "descriptionStart": "尋找起點或更多說明？請前往",
+    "descriptionMiddle": "或",
+    "descriptionEnd": "中心。",
+    "templates": "模板",
+    "learning": "學習",
+    "deploy": "立即部署",
+    "readDocs": "閱讀文檔"
+  },
+  "Dashboard": {
+    "title": "香港更年期學會",
+    "welcome": "歡迎使用您的儀表板",
+    "nav": {
+      "menu": "選單",
+      "administration": "管理",
+      "websiteContent": "網站內容",
+      "other": "其他",
+      "overview": "總覽",
+      "symptoms": "症狀",
+      "appointments": "預約",
+      "articles": "文章",
+      "settings": "設定",
+      "mainSite": "主網站",
+      "usersManagement": "用戶管理",
+      "servicesManagement": "服務管理",
+      "faqManagement": "常見問題管理"
+    },
+    "footer": {
+      "version": "版本"
+    },
+    "cards": {
+      "symptoms": {
+        "title": "已追蹤症狀",
+        "description": "本月"
+      },
+      "appointments": {
+        "title": "即將到來的預約",
+        "description": "未來30天"
+      },
+      "articles": {
+        "title": "已閱讀文章",
+        "description": "本月"
+      }
+    },
+    "recentActivity": {
+      "title": "最近活動",
+      "placeholder": "暫無最近活動可顯示。"
+    }
+  },
+  "Auth": {
+    "signIn": {
+      "title": "登入",
+      "subtitle": "歡迎回來！請登入以繼續。",
+      "email": "電子郵件",
+      "emailPlaceholder": "你的電郵@example.com",
+      "password": "密碼",
+      "passwordPlaceholder": "••••••••",
+      "forgotPassword": "忘記密碼？",
+      "submitButton": "登入",
+      "submitting": "登入中...",
+      "orContinueWith": "或繼續使用",
+      "googleButton": "使用 Google 登入",
+      "googleButtonLoading": "登入中...",
+      "noAccount": "還沒有帳戶？",
+      "signUpLink": "註冊"
+    },
+    "signUp": {
+      "title": "建立帳戶",
+      "subtitle": "立即加入我們！請填寫以下詳細資料。",
+      "name": "全名",
+      "namePlaceholder": "陳大文",
+      "email": "電子郵件",
+      "emailPlaceholder": "你的電郵@example.com",
+      "password": "密碼",
+      "passwordPlaceholder": "••••••••",
+      "passwordHint": "至少需要6個字元",
+      "confirmPassword": "確認密碼",
+      "confirmPasswordPlaceholder": "••••••••",
+      "submitButton": "建立帳戶",
+      "submitting": "建立帳戶中...",
+      "orContinueWith": "或繼續使用",
+      "googleButton": "使用 Google 註冊",
+      "googleButtonLoading": "註冊中...",
+      "haveAccount": "已經有帳戶？",
+      "signInLink": "登入"
+    },
+    "resetPassword": {
+      "title": "重設密碼",
+      "subtitle": "請為您的帳戶建立新密碼",
+      "currentPassword": "目前密碼",
+      "currentPasswordPlaceholder": "輸入您的目前密碼",
+      "newPassword": "新密碼",
+      "newPasswordPlaceholder": "輸入您的新密碼",
+      "confirmPassword": "確認新密碼",
+      "confirmPasswordPlaceholder": "確認您的新密碼",
+      "passwordHint": "至少需要6個字元",
+      "submitButton": "重設密碼",
+      "updating": "更新中...",
+      "success": "成功重設密碼",
+      "error": "重設密碼失敗",
+      "passwordMismatch": "密碼不相符",
+      "passwordTooShort": "密碼至少需要6個字元",
+      "loading": "載入中..."
+    }
+  },
+  "UsersManagement": {
+    "title": "用戶管理",
+    "subtitle": "管理和監控所有用戶帳戶",
+    "addUserButton": "新增用戶",
+    "search": "搜尋用戶...",
+    "allRoles": "所有角色",
+    "allStatus": "所有狀態",
+    "stats": {
+      "totalUsers": "總用戶數",
+      "activeToday": "今日活躍",
+      "premiumMembers": "高級會員",
+      "administrators": "管理員"
+    },
+    "table": {
+      "user": "用戶",
+      "role": "角色",
+      "status": "狀態",
+      "membership": "會籍",
+      "joined": "加入日期",
+      "lastActive": "最後活躍",
+      "actions": "操作"
+    },
+    "roles": {
+      "administrator": "管理員",
+      "moderator": "版主",
+      "contentCreator": "內容創作者",
+      "member": "會員"
+    },
+    "status": {
+      "active": "活躍",
+      "suspended": "已暫停"
+    },
+    "membership": {
+      "platinum": "白金",
+      "gold": "黃金",
+      "silver": "白銀",
+      "free": "免費"
+    },
+    "pagination": {
+      "showing": "顯示第 {from}-{to} 筆，共 {total} 位用戶",
+      "previous": "上一頁",
+      "next": "下一頁"
+    },
+    "time": {
+      "hoursAgo": "{hours} 小時前",
+      "hourAgo": "1 小時前",
+      "daysAgo": "{days} 天前",
+      "dayAgo": "1 天前",
+      "weeksAgo": "{weeks} 週前",
+      "weekAgo": "1 週前",
+      "unknown": "從未"
+    },
+    "addUser": {
+      "title": "新增用戶",
+      "description": "使用預設憑證建立新用戶帳戶",
+      "name": "全名",
+      "namePlaceholder": "張三",
+      "email": "電子郵件地址",
+      "emailPlaceholder": "user@example.com",
+      "role": "角色",
+      "selectRole": "選擇角色",
+      "membershipLevel": "會籍等級",
+      "selectMembership": "選擇會籍",
+      "defaultPassword": {
+        "title": "預設密碼",
+        "description": "用戶首次登入時需要重設密碼"
+      },
+      "cancel": "取消",
+      "create": "建立用戶",
+      "creating": "建立中...",
+      "success": "成功建立用戶",
+      "error": "建立用戶失敗"
+    },
+    "actions": {
+      "title": "操作",
+      "changeRole": "更改角色",
+      "suspendUser": "暫停用戶",
+      "activateUser": "啟用用戶",
+      "resetPassword": "要求重設密碼"
+    }
+  },
+  "ServicesManagement": {
+    "title": "服務管理",
+    "subtitle": "管理網站上顯示的服務",
+    "addButton": "新增服務",
+    "search": "搜尋服務...",
+    "allStatus": "所有狀態",
+    "activeOnly": "僅顯示活躍",
+    "inactiveOnly": "僅顯示停用",
+    "noServices": "找不到服務。創建您的第一個服務以開始使用。",
+    "table": {
+      "service": "服務",
+      "status": "狀態",
+      "order": "順序",
+      "createdAt": "建立日期",
+      "actions": "操作"
+    },
+    "status": {
+      "active": "活躍",
+      "inactive": "停用"
+    },
+    "dialog": {
+      "addTitle": "新增服務",
+      "editTitle": "編輯服務",
+      "addDescription": "填寫詳細資料以建立新服務。",
+      "editDescription": "更新以下服務詳細資料。",
+      "title": "標題",
+      "titlePlaceholder": "輸入服務標題",
+      "description": "描述",
+      "descriptionPlaceholder": "輸入服務描述",
+      "imageUrl": "圖片網址",
+      "imageUrlPlaceholder": "https://example.com/image.jpg",
+      "order": "顯示順序",
+      "orderHint": "數字越小越靠前顯示",
+      "active": "啟用",
+      "activeHint": "在網站上顯示此服務",
+      "cancel": "取消",
+      "create": "建立服務",
+      "update": "更新服務",
+      "creating": "建立中...",
+      "updating": "更新中..."
+    },
+    "actions": {
+      "edit": "編輯",
+      "delete": "刪除",
+      "deleteConfirm": "確定要刪除此服務嗎？",
+      "deleteSuccess": "成功刪除服務",
+      "createSuccess": "成功建立服務",
+      "updateSuccess": "成功更新服務",
+      "error": "發生錯誤"
+    },
+    "loading": "載入服務中..."
+  },
+  "MainSite": {
+    "nav": {
+      "home": "首頁",
+      "about": "關於我們",
+      "service": "服務",
+      "event": "活動",
+      "contact": "聯絡我們",
+      "joinNow": "立即加入",
+      "dashboard": "儀表板",
+      "profile": "個人資料",
+      "signOut": "登出"
+    },
+    "hero": {
+      "title": "您的健康之旅從這裡開始",
+      "description": "為更年期健康提供全面的支持和資源。加入我們的社區，透過專業指導和關懷備至的照護，掌控您的福祉。",
+      "joinNow": "立即加入",
+      "learnMore": "了解更多"
+    },
+    "valueProposition": {
+      "subtitle": "原因",
+      "title": "為什麼您需要加入？",
+      "heading": "香港最大的更年期協會",
+      "description": "我們是香港最大的更年期協會，致力於支持、教育和賦權女性度過更年期的每個階段。",
+      "cta": "關於我們"
+    },
+    "services": {
+      "badge": "我們的服務",
+      "title": "探索香港更年期學會",
+      "subtitle": "探索一個致力於支持香港女性度過更年期每個階段的社區",
+      "items": {
+        "community": {
+          "title": "社區平台",
+          "description": "探索一個致力於支持香港女性度過更年期每個階段的社區。"
+        },
+        "events": {
+          "title": "活動",
+          "description": "參加專為教育和賦權女性而設計的工作坊、講座和聚會。"
+        },
+        "medical": {
+          "title": "醫療支援",
+          "description": "獲取值得信賴的醫療資訊和專為更年期護理量身定制的專業支援。"
+        }
+      },
+      "imageAlt": "互相支持的女性",
+      "cta": {
+        "description": "我們是香港最大的更年期協會，致力於支持、教育和賦權女性度過更年期的每個階段。",
+        "button": "立即加入"
+      }
+    },
+    "faq": {
+      "badge": "常見問題",
+      "title": "常見問題解答",
+      "subtitle": "尋找有關我們協會的常見問題答案",
+      "items": {
+        "join": {
+          "question": "為什麼我們要加入香港更年期學會？",
+          "answer": "我們是香港最大的更年期協會，致力於支持、教育和賦權女性度過更年期的每個階段。"
+        },
+        "payment": {
+          "question": "加入社區需要付費嗎？",
+          "answer": "部分資源是免費的，而高級課程、活動或醫療支援服務可能需要會員資格或收費。"
+        },
+        "areas": {
+          "question": "社區服務香港哪些地區？",
+          "answer": "我們的社區為香港所有地區的女性提供服務，包括線上和精選的線下活動。"
+        },
+        "support": {
+          "question": "如果我的問題未列出，如何獲得幫助？",
+          "answer": "您可以通過「聯絡我們」頁面直接聯繫我們的團隊，我們將樂意為您提供協助。"
+        }
+      },
+      "contact": {
+        "text": "需要其他問題的幫助？",
+        "link": "聯絡我們"
+      }
+    },
+    "upcomingEvent": {
+      "badge": "即將舉行的活動",
+      "title": "觀看更年期電影",
+      "description": "探索一個致力於支持香港女性度過更年期每個階段的社區",
+      "countdown": {
+        "days": "天",
+        "hours": "小時",
+        "minutes": "分鐘",
+        "seconds": "秒"
+      },
+      "date": "2026年1月15日於香港",
+      "imageAlt": "更年期電影活動",
+      "cta": {
+        "button": "立即參加活動",
+        "text": "尋找其他活動？",
+        "link": "顯示所有活動"
+      }
+    },
+    "testimonial": {
+      "badge": "她們的分享",
+      "title": "來自我們的社區",
+      "subtitle": "專家撰寫的文章涵蓋更年期的各個方面，從症狀到解決方案。",
+      "items": {
+        "alice": {
+          "quote": "我終於感到被理解，並有信心應對更年期。強烈推薦！",
+          "name": "區愛麗絲",
+          "role": "Primemidlife.com 創辦人"
+        },
+        "michelle": {
+          "quote": "這個社區在我最需要的時候給了我清晰、信心和支持。",
+          "name": "黃美雪",
+          "role": "社區成員"
+        }
+      }
+    },
+    "articles": {
+      "badge": "精選文章",
+      "title": "關於更年期的所有文章",
+      "subtitle": "專家撰寫的文章涵蓋更年期的各個方面，從症狀到解決方案。",
+      "items": {
+        "menopause": {
+          "title": "更年期為何如此重要",
+          "description": "探索香港更年期學會 - 您值得信賴的社區，為您在更年期的每個階段提供支持、教育和賦權。"
+        },
+        "healthy": {
+          "title": "更健康更快樂",
+          "description": "探索香港更年期學會 - 您值得信賴的社區，為您在更年期的每個階段提供支持、教育和賦權。"
+        },
+        "mindfulness": {
+          "title": "掌控你的思維帶來美好",
+          "description": "探索香港更年期學會 - 您值得信賴的社區，為您在更年期的每個階段提供支持、教育和賦權。"
+        }
+      },
+      "readMore": "閱讀更多",
+      "viewAll": "查看所有文章"
+    },
+    "footer": {
+      "cta": {
+        "title": "您的健康生活之路從這裡開始",
+        "button": "加入我們的社區"
+      },
+      "quick": {
+        "title": "快速連結",
+        "home": "首頁",
+        "about": "關於我們",
+        "service": "服務",
+        "event": "活動"
+      },
+      "company": {
+        "title": "公司",
+        "aboutUs": "關於我們",
+        "team": "團隊",
+        "contact": "聯絡我們"
+      },
+      "resource": {
+        "title": "資源",
+        "articles": "文章",
+        "faq": "常見問題",
+        "support": "支援"
+      },
+      "copyright": "© 2025 香港更年期協會。保留所有權利。"
+    }
+  }
+}

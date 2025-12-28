@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ServicesService } from '@/features/services/services/services.service';
+import { successResponse, ApiErrors } from '@/lib/api-response';
 
 // GET /api/public/services - Get all active services (public, no auth required)
 export async function GET(request: NextRequest) {
@@ -15,12 +16,9 @@ export async function GET(request: NextRequest) {
       locale 
     });
 
-    return NextResponse.json(services);
+    return successResponse(services);
   } catch (error) {
     console.error('Error fetching services:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch services' },
-      { status: 500 }
-    );
+    return ApiErrors.internal('Failed to fetch services');
   }
 }

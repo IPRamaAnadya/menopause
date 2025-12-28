@@ -31,7 +31,9 @@ export function FAQSection() {
           },
         });
         if (response.ok) {
-          const data = await response.json();
+          const result = await response.json();
+          // Handle new API response structure
+          const data = result.success && result.data ? result.data : [];
           setFaqs(data);
           // Set first FAQ as open by default
           if (data.length > 0) {

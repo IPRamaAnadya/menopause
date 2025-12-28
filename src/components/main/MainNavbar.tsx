@@ -27,6 +27,7 @@ export function MainNavbar() {
     { href: '/', label: t('nav.home') },
     { href: '/about', label: t('nav.about') },
     { href: '/service', label: t('nav.service') },
+    { href: '/articles', label: t('nav.articles') },
     { href: '/event', label: t('nav.event') },
     { href: '/contact', label: t('nav.contact') },
   ];
@@ -104,9 +105,11 @@ export function MainNavbar() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard">{t('nav.dashboard')}</Link>
-                  </DropdownMenuItem>
+                  {session.user.role === 'Administrator' && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard">{t('nav.dashboard')}</Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem asChild>
                     <Link href="/profile">{t('nav.profile')}</Link>
                   </DropdownMenuItem>

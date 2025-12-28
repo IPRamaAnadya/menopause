@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ServicesService } from '@/features/services/services/services.service';
+import { successResponse, ApiErrors } from '@/lib/api-response';
 
 // GET /api/public/services/[id] - Get a single active service (public, no auth required)
 export async function GET(
@@ -14,26 +15,17 @@ export async function GET(
     const service = await ServicesService.getServiceById(parseInt(id), locale);
 
     if (!service) {
-      return NextResponse.json(
-        { error: 'Service not found' },
-        { status: 404 }
-      );
+      return ApiErrors.notFound('Service');
     }
 
     // Only return if service is active
     if (!service.is_active) {
-      return NextResponse.json(
-        { error: 'Service not found' },
-        { status: 404 }
-      );
+      return ApiErrors.notFound('Service');
     }
 
-    return NextResponse.json(service);
+    return successResponse(service);
   } catch (error) {
     console.error('Error fetching service:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch service' },
-      { status: 500 }
-    );
+    return ApiErrors.internal('Failed to fetch service');
   }
 }

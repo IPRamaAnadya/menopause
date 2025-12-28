@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,6 +52,7 @@ import { useFaqs } from "@/features/faq/hooks/useFaqs";
 import { useFaqActions } from "@/features/faq/hooks/useFaqActions";
 
 export default function AdminFAQManagementPage() {
+  const t = useTranslations('FAQManagement');
   const { faqs, loading, refresh } = useFaqs();
   const { createFaq, updateFaq, deleteFaq, loading: actionLoading } =
     useFaqActions(refresh);
@@ -138,7 +140,7 @@ export default function AdminFAQManagementPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (confirm("Are you sure you want to delete this FAQ?")) {
+    if (confirm(t('actions.deleteConfirm'))) {
       await deleteFaq(id);
     }
   };
@@ -181,10 +183,10 @@ export default function AdminFAQManagementPage() {
           throw new Error("Failed to update order");
         }
 
-        toast.success("Order updated successfully");
+        toast.success(t('orderUpdated'));
         refresh();
       } catch (error) {
-        toast.error("Failed to update order");
+        toast.error(t('orderFailed'));
         console.error("Error updating order:", error);
       }
     }
@@ -225,7 +227,7 @@ export default function AdminFAQManagementPage() {
                 : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400"
             }`}
           >
-            {faq.is_active ? "Active" : "Inactive"}
+            {faq.is_active ? t('status.active') : t('status.inactive')}
           </span>
         </div>
 
@@ -247,7 +249,7 @@ export default function AdminFAQManagementPage() {
             className="flex-1"
           >
             <Pencil className="h-4 w-4 mr-2" />
-            Edit
+            {t('actions.edit')}
           </Button>
           <Button
             variant="outline"
@@ -307,7 +309,7 @@ export default function AdminFAQManagementPage() {
                 : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400"
             }`}
           >
-            {faq.is_active ? "Active" : "Inactive"}
+            {faq.is_active ? t('status.active') : t('status.inactive')}
           </span>
         </td>
         <td className="px-3 py-3 sm:px-4 sm:py-4">
@@ -341,7 +343,7 @@ export default function AdminFAQManagementPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading FAQs...</p>
+          <p className="text-muted-foreground">{t('loading')}</p>
         </div>
       </div>
     );
@@ -352,14 +354,14 @@ export default function AdminFAQManagementPage() {
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">FAQ Management</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t('title')}</h1>
           <p className="text-sm sm:text-base text-muted-foreground">
-            Manage frequently asked questions
+            {t('subtitle')}
           </p>
         </div>
         <Button onClick={() => setIsDialogOpen(true)} className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
-          Add FAQ
+          {t('addButton')}
         </Button>
       </div>
 
@@ -368,7 +370,7 @@ export default function AdminFAQManagementPage() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search FAQs..."
+            placeholder={t('search')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9 text-sm sm:text-base"
@@ -379,9 +381,9 @@ export default function AdminFAQManagementPage() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="active">Active Only</SelectItem>
-            <SelectItem value="inactive">Inactive Only</SelectItem>
+            <SelectItem value="all">{t('allStatus')}</SelectItem>
+            <SelectItem value="active">{t('activeOnly')}</SelectItem>
+            <SelectItem value="inactive">{t('inactiveOnly')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -390,13 +392,13 @@ export default function AdminFAQManagementPage() {
       {filteredFaqs.length === 0 ? (
         <div className="rounded-lg border border-dashed p-12 text-center">
           <HelpCircle className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No FAQs found</h3>
+          <h3 className="text-lg font-semibold mb-2">{t('noFaqs')}</h3>
           <p className="text-muted-foreground mb-4">
-            Get started by creating your first FAQ
+            {t('getStarted')}
           </p>
           <Button onClick={() => setIsDialogOpen(true)} variant="outline">
             <Plus className="mr-2 h-4 w-4" />
-            Add FAQ
+            {t('addButton')}
           </Button>
         </div>
       ) : (
@@ -426,9 +428,9 @@ export default function AdminFAQManagementPage() {
                 <thead className="border-b bg-muted/50">
                   <tr>
                     <th className="px-4 py-3 text-left text-sm font-medium w-12"></th>
-                    <th className="px-4 py-3 text-left text-sm font-medium">Question</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium">Status</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium">Actions</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">{t('table.question')}</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">{t('table.status')}</th>
+                    <th className="px-4 py-3 text-right text-sm font-medium">{t('table.actions')}</th>
                   </tr>
                 </thead>
                 <SortableContext
@@ -452,12 +454,12 @@ export default function AdminFAQManagementPage() {
         <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {editingFAQ ? "Edit FAQ" : "Add New FAQ"}
+              {editingFAQ ? t('dialog.editTitle') : t('dialog.addTitle')}
             </DialogTitle>
             <DialogDescription>
               {editingFAQ 
-                ? "Update the FAQ details below"
-                : "Fill in the details to create a new FAQ"}
+                ? t('dialog.editDescription')
+                : t('dialog.addDescription')}
             </DialogDescription>
           </DialogHeader>
 
@@ -465,18 +467,18 @@ export default function AdminFAQManagementPage() {
             <div className="grid gap-4 py-4">
               {/* Translations Section */}
               <div className="space-y-4 rounded-lg border p-4 bg-muted/50">
-                <h4 className="font-medium text-sm">Translations</h4>
+                <h4 className="font-medium text-sm">{t('dialog.translations')}</h4>
                 
                 {/* English Translation */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">🇬🇧 English</span>
+                    <span className="text-sm font-medium">🇬🇧 {t('dialog.english')}</span>
                   </div>
                   <div>
-                    <Label htmlFor="en-question">Question</Label>
+                    <Label htmlFor="en-question">{t('dialog.question')}</Label>
                     <Input
                       id="en-question"
-                      placeholder="English question"
+                      placeholder={t('dialog.questionPlaceholder')}
                       value={formData.translations?.[0]?.question || ""}
                       onChange={(e) => {
                         const newTranslations = [...(formData.translations || [])];
@@ -487,10 +489,10 @@ export default function AdminFAQManagementPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="en-answer">Answer</Label>
+                    <Label htmlFor="en-answer">{t('dialog.answer')}</Label>
                     <textarea
                       id="en-answer"
-                      placeholder="English answer"
+                      placeholder={t('dialog.answerPlaceholder')}
                       className="min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
                       value={formData.translations?.[0]?.answer || ""}
                       onChange={(e) => {
@@ -506,13 +508,13 @@ export default function AdminFAQManagementPage() {
                 {/* Chinese Translation */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">🇭🇰 繁體中文</span>
+                    <span className="text-sm font-medium">🇭🇰 {t('dialog.chinese')}</span>
                   </div>
                   <div>
-                    <Label htmlFor="zh-question">問題</Label>
+                    <Label htmlFor="zh-question">{t('dialog.questionZh')}</Label>
                     <Input
                       id="zh-question"
-                      placeholder="中文問題"
+                      placeholder={t('dialog.questionPlaceholderZh')}
                       value={formData.translations?.[1]?.question || ""}
                       onChange={(e) => {
                         const newTranslations = [...(formData.translations || [])];
@@ -522,10 +524,10 @@ export default function AdminFAQManagementPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="zh-answer">答案</Label>
+                    <Label htmlFor="zh-answer">{t('dialog.answerZh')}</Label>
                     <textarea
                       id="zh-answer"
-                      placeholder="中文答案"
+                      placeholder={t('dialog.answerPlaceholderZh')}
                       className="min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
                       value={formData.translations?.[1]?.answer || ""}
                       onChange={(e) => {
@@ -550,10 +552,10 @@ export default function AdminFAQManagementPage() {
                 />
                 <div className="flex-1">
                   <Label htmlFor="is_active" className="font-medium">
-                    Active Status
+                    {t('dialog.activeStatus')}
                   </Label>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Active FAQs will be visible to users on the website
+                    {t('dialog.activeHint')}
                   </p>
                 </div>
               </div>
@@ -561,16 +563,16 @@ export default function AdminFAQManagementPage() {
             
             <DialogFooter>
               <Button type="button" variant="outline" onClick={handleDialogClose}>
-                Cancel
+                {t('dialog.cancel')}
               </Button>
               <Button type="submit" disabled={actionLoading}>
                 {actionLoading
                   ? editingFAQ
-                    ? "Updating..."
-                    : "Creating..."
+                    ? t('dialog.updating')
+                    : t('dialog.creating')
                   : editingFAQ
-                  ? "Update FAQ"
-                  : "Create FAQ"}
+                  ? t('dialog.update')
+                  : t('dialog.create')}
               </Button>
             </DialogFooter>
           </form>

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { hash } from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
+import { successResponse, ApiErrors } from '@/lib/api-response';
 
 export async function POST(request: Request) {
   try {
@@ -8,10 +9,7 @@ export async function POST(request: Request) {
 
     // Validation
     if (!email || !password) {
-      return NextResponse.json(
-        { error: 'Email and password are required' },
-        { status: 400 }
-      );
+      return ApiErrors.validation({ email, password }, 'Email and password are required');
     }
 
     // Check if user already exists
@@ -20,10 +18,7 @@ export async function POST(request: Request) {
     });
 
     if (existingUser) {
-      return NextResponse.json(
-        { error: 'User already exists with this email' },
-        { status: 400 }
-      );
+      return ApiErrors.alreadyExists('User with this email');
     }
 
     // Hash password
@@ -77,7 +72,7 @@ export async function POST(request: Request) {
       });
     }
 
-    return NextResponse.json(
+    return successResponse(
       {
         user: {
           id: user.id,
@@ -85,13 +80,10 @@ export async function POST(request: Request) {
           email: user.email,
         },
       },
-      { status: 201 }
+      201
     );
   } catch (error) {
     console.error('Registration error:', error);
-    return NextResponse.json(
-      { error: 'Something went wrong during registration' },
-      { status: 500 }
-    );
+    return ApiErrors.internal('Something went wrong during registration');
   }
 }

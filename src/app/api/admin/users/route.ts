@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { UserManagementService } from '@/features/user-management/services/user-management.service';
+import { paginatedResponse, successResponse, ApiErrors } from '@/lib/api-response';
 
 /**
  * GET /api/admin/users
@@ -14,10 +15,7 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions);
     
     if (!session || !session.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return ApiErrors.unauthorized();
     }
 
     // TODO: Check if user has admin role
@@ -40,10 +38,7 @@ export async function GET(request: NextRequest) {
 
     // Validate pagination parameters
     if (page < 1 || limit < 1 || limit > 100) {
-      return NextResponse.json(
-        { error: 'Invalid pagination parameters' },
-        { status: 400 }
-      );
+      return ApiErrors.validation({ page, limit }, 'Invalid pagination parameters');
     }
 
     // Get users with filters
@@ -55,13 +50,10 @@ export async function GET(request: NextRequest) {
       limit,
     });
 
-    return NextResponse.json(result, { status: 200 });
+    return paginatedResponse(result.users, result.page, result.limit, result.total);
   } catch (error) {
     console.error('Error fetching users:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return ApiErrors.internal('Internal server error');
   }
 }
 
@@ -76,10 +68,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
     
     if (!session || !session.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return ApiErrors.unauthorized();
     }
 
     // TODO: Check if user has admin role
@@ -90,19 +79,13 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (!email || !name || !role) {
-      return NextResponse.json(
-        { error: 'Email, name, and role are required' },
-        { status: 400 }
-      );
+      return ApiErrors.validation({ email, name, role }, 'Email, name, and role are required');
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Invalid email format' },
-        { status: 400 }
-      );
+      return ApiErrors.validation({ email }, 'Invalid email format');
     }
 
     // Create user
@@ -113,7 +96,7 @@ export async function POST(request: NextRequest) {
       membershipSlug: membershipLevel,
     });
 
-    return NextResponse.json(
+    return successResponse(
       { 
         message: 'User created successfully',
         user: {
@@ -123,29 +106,20 @@ export async function POST(request: NextRequest) {
           name: user.name,
         },
       },
-      { status: 201 }
+      201
     );
   } catch (error) {
     console.error('Error creating user:', error);
     
     if (error instanceof Error) {
       if (error.message.includes('already exists')) {
-        return NextResponse.json(
-          { error: error.message },
-          { status: 409 }
-        );
+        return ApiErrors.alreadyExists('User');
       }
       if (error.message.includes('not found')) {
-        return NextResponse.json(
-          { error: error.message },
-          { status: 400 }
-        );
+        return ApiErrors.validation({ error: error.message });
       }
     }
 
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return ApiErrors.internal('Internal server error');
   }
 }

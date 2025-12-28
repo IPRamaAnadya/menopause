@@ -141,6 +141,8 @@ model users {
   memberships       memberships[]
   sessions          sessions[]
   user_roles        user_roles[]
+  articles          articles[]
+  article_reviews   article_reviews[]
 }
 
 model services {
@@ -194,4 +196,106 @@ enum MembershipStatus {
 enum UserStatus {
   ACTIVE
   SUSPENDED
+}
+
+enum ArticleVisibility {
+  PUBLIC
+  MEMBER
+  PRIORITY
+}
+
+model categories {
+  id                      Int                       @id @default(autoincrement())
+  parent_id               Int?
+  slug                    String                    @unique @db.VarChar(255)
+  order                   Int                       @default(0)
+  is_active               Boolean                   @default(true)
+  created_at              DateTime                  @default(now())
+  updated_at              DateTime                  @updatedAt
+  parent                  categories?               @relation("CategoryChildren", fields: [parent_id], references: [id], onDelete: Cascade)
+  children                categories[]              @relation("CategoryChildren")
+  category_translations   category_translations[]
+  articles                articles[]
+
+  @@index([parent_id])
+  @@index([slug])
+  @@index([is_active])
+  @@index([order])
+}
+
+model category_translations {
+  id          Int        @id @default(autoincrement())
+  category_id Int
+  locale      String     @db.VarChar(10)
+  name        String     @db.VarChar(255)
+  description String?    @db.Text
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+  categories  categories @relation(fields: [category_id], references: [id], onDelete: Cascade)
+
+  @@unique([category_id, locale])
+  @@index([locale])
+}
+
+model articles {
+  id                 Int                  @id @default(autoincrement())
+  public_id          String               @unique @default(uuid()) @db.Uuid
+  category_id        Int
+  author_id          Int
+  slug               String               @unique @db.VarChar(255)
+  image_url          String?              @db.Text
+  tags               String[]             @default([])
+  visibility         ArticleVisibility    @default(PUBLIC)
+  required_priority  Int?                 @db.SmallInt
+  is_published       Boolean              @default(false)
+  is_highlighted     Boolean              @default(false)
+  published_at       DateTime?
+  created_at         DateTime             @default(now())
+  updated_at         DateTime             @updatedAt
+  categories         categories           @relation(fields: [category_id], references: [id], onDelete: Cascade)
+  author             users                @relation(fields: [author_id], references: [id], onDelete: Cascade)
+  article_translations article_translations[]
+  article_reviews    article_reviews[]
+
+  @@index([category_id])
+  @@index([author_id])
+  @@index([slug])
+  @@index([visibility])
+  @@index([is_published])
+  @@index([is_highlighted])
+  @@index([published_at])
+}
+
+model article_translations {
+  id          Int      @id @default(autoincrement())
+  article_id  Int
+  locale      String   @db.VarChar(10)
+  title       String   @db.VarChar(255)
+  excerpt     String?  @db.Text
+  description String   @db.Text
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  articles    articles @relation(fields: [article_id], references: [id], onDelete: Cascade)
+
+  @@unique([article_id, locale])
+  @@index([locale])
+}
+
+model article_reviews {
+  id          Int               @id @default(autoincrement())
+  article_id  Int
+  user_id     Int
+  parent_id   Int?
+  content     String            @db.Text
+  rating      Int?              @db.SmallInt
+  created_at  DateTime          @default(now())
+  updated_at  DateTime          @updatedAt
+  article     articles          @relation(fields: [article_id], references: [id], onDelete: Cascade)
+  user        users             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  parent      article_reviews?  @relation("ReviewReplies", fields: [parent_id], references: [id], onDelete: Cascade)
+  replies     article_reviews[] @relation("ReviewReplies")
+
+  @@index([article_id])
+  @@index([user_id])
+  @@index([parent_id])
 }

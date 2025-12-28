@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FAQService } from '@/features/faq/services/faq.service';
+import { successResponse, ApiErrors } from '@/lib/api-response';
 
 // GET /api/admin/faq - Get all FAQs (admin, can filter by active)
 export async function GET(request: NextRequest) {
@@ -7,13 +8,10 @@ export async function GET(request: NextRequest) {
     const locale = request.headers.get('locale') || undefined;
     const activeOnly = request.nextUrl.searchParams.get('active') === 'true';
     const faqs = await FAQService.getFAQs({ activeOnly, locale });
-    return NextResponse.json(faqs);
+    return successResponse(faqs);
   } catch (error) {
     console.error('Error fetching FAQs:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch FAQs' },
-      { status: 500 }
-    );
+    return ApiErrors.internal('Failed to fetch FAQs');
   }
 }
 
@@ -22,12 +20,9 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const faq = await FAQService.createFAQ(body);
-    return NextResponse.json(faq);
+    return successResponse(faq, 201);
   } catch (error) {
     console.error('Error creating FAQ:', error);
-    return NextResponse.json(
-      { error: 'Failed to create FAQ' },
-      { status: 500 }
-    );
+    return ApiErrors.internal('Failed to create FAQ');
   }
 }

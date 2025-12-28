@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { compare, hash } from 'bcryptjs';
+import { successResponse, ApiErrors } from '@/lib/api-response';
 
 /**
  * POST /api/auth/reset-password
@@ -13,27 +14,18 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return ApiErrors.unauthorized();
     }
 
     const body = await request.json();
     const { newPassword } = body;
 
     if (!newPassword) {
-      return NextResponse.json(
-        { error: 'New password is required' },
-        { status: 400 }
-      );
+      return ApiErrors.validation({ newPassword: 'Required' }, 'New password is required');
     }
 
     if (newPassword.length < 6) {
-      return NextResponse.json(
-        { error: 'New password must be at least 6 characters' },
-        { status: 400 }
-      );
+      return ApiErrors.validation({ newPassword: 'Must be at least 6 characters' }, 'New password must be at least 6 characters');
     }
 
     // Get user from database
@@ -42,10 +34,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      return ApiErrors.notFound('User');
     }
 
     // Hash new password
@@ -60,15 +49,9 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(
-      { message: 'Password updated successfully' },
-      { status: 200 }
-    );
+    return successResponse({ message: 'Password updated successfully' });
   } catch (error) {
     console.error('Error resetting password:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return ApiErrors.internal('Internal server error');
   }
 }

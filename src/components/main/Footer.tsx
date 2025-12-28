@@ -14,6 +14,7 @@ export function Footer() {
     { href: '/', label: t('quick.home') },
     { href: '/about', label: t('quick.about') },
     { href: '/service', label: t('quick.service') },
+    { href: '/articles', label: t('quick.articles') },
     { href: '/event', label: t('quick.event') },
   ];
 

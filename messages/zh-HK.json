@@ -25,7 +25,10 @@
       "mainSite": "主網站",
       "usersManagement": "用戶管理",
       "servicesManagement": "服務管理",
-      "faqManagement": "常見問題管理"
+      "faqManagement": "常見問題管理",
+      "articleManagement": "文章管理",
+      "categoryManagement": "分類管理",
+      "articlesManagement": "文章管理"
     },
     "footer": {
       "version": "版本"
@@ -215,6 +218,8 @@
       "titlePlaceholder": "輸入服務標題",
       "description": "描述",
       "descriptionPlaceholder": "輸入服務描述",
+      "image": "圖片",
+      "imageHint": "上傳圖片或輸入網址",
       "imageUrl": "圖片網址",
       "imageUrlPlaceholder": "https://example.com/image.jpg",
       "order": "顯示順序",
@@ -238,12 +243,210 @@
     },
     "loading": "載入服務中..."
   },
+  "FAQManagement": {
+    "title": "常見問題管理",
+    "subtitle": "管理常見問題",
+    "addButton": "新增常見問題",
+    "search": "搜尋常見問題...",
+    "allStatus": "所有狀態",
+    "activeOnly": "僅顯示活躍",
+    "inactiveOnly": "僅顯示停用",
+    "noFaqs": "找不到常見問題",
+    "getStarted": "創建您的第一個常見問題以開始使用",
+    "table": {
+      "question": "問題",
+      "status": "狀態",
+      "actions": "操作"
+    },
+    "status": {
+      "active": "活躍",
+      "inactive": "停用"
+    },
+    "dialog": {
+      "addTitle": "新增常見問題",
+      "editTitle": "編輯常見問題",
+      "addDescription": "填寫詳細資料以建立新常見問題",
+      "editDescription": "更新以下常見問題詳細資料",
+      "translations": "翻譯",
+      "english": "English",
+      "chinese": "繁體中文",
+      "question": "Question",
+      "questionPlaceholder": "English question",
+      "answer": "Answer",
+      "answerPlaceholder": "English answer",
+      "questionZh": "問題",
+      "questionPlaceholderZh": "中文問題",
+      "answerZh": "答案",
+      "answerPlaceholderZh": "中文答案",
+      "activeStatus": "啟用狀態",
+      "activeHint": "啟用的常見問題將在網站上顯示給用戶",
+      "cancel": "取消",
+      "create": "建立常見問題",
+      "update": "更新常見問題",
+      "creating": "建立中...",
+      "updating": "更新中..."
+    },
+    "actions": {
+      "edit": "編輯",
+      "delete": "刪除",
+      "deleteConfirm": "確定要刪除此常見問題嗎？"
+    },
+    "loading": "載入常見問題中...",
+    "orderUpdated": "順序更新成功",
+    "orderFailed": "順序更新失敗"
+  },
+  "CategoryManagement": {
+    "title": "分類管理",
+    "subtitle": "管理文章分類",
+    "addButton": "新增分類",
+    "search": "搜尋分類...",
+    "allStatus": "所有狀態",
+    "activeOnly": "僅顯示活躍",
+    "inactiveOnly": "僅顯示停用",
+    "noCategories": "找不到分類",
+    "getStarted": "創建您的第一個分類以開始使用",
+    "table": {
+      "category": "分類",
+      "status": "狀態",
+      "actions": "操作"
+    },
+    "status": {
+      "active": "活躍",
+      "inactive": "停用"
+    },
+    "dialog": {
+      "addTitle": "新增分類",
+      "editTitle": "編輯分類",
+      "addDescription": "填寫詳細資料以建立新分類",
+      "editDescription": "更新以下分類詳細資料",
+      "slug": "網址代碼",
+      "slugPlaceholder": "category-slug",
+      "slugHint": "網址友好識別符（僅限小寫字母、連字符）",
+      "parent": "上層分類（可選）",
+      "parentPlaceholder": "選擇上層分類",
+      "noParent": "無上層（頂層）",
+      "translations": "翻譯",
+      "english": "English",
+      "chinese": "繁體中文",
+      "name": "Name",
+      "namePlaceholder": "English name",
+      "description": "Description (Optional)",
+      "descriptionPlaceholder": "English description",
+      "nameZh": "名稱",
+      "namePlaceholderZh": "中文名稱",
+      "descriptionZh": "描述（可選）",
+      "descriptionPlaceholderZh": "中文描述",
+      "activeStatus": "啟用狀態",
+      "activeHint": "啟用的分類將在網站上顯示給用戶",
+      "cancel": "取消",
+      "create": "建立分類",
+      "update": "更新分類",
+      "creating": "建立中...",
+      "updating": "更新中..."
+    },
+    "actions": {
+      "edit": "編輯",
+      "delete": "刪除",
+      "deleteConfirm": "確定要刪除此分類嗎？這也會刪除此分類下的所有文章。"
+    },
+    "loading": "載入分類中...",
+    "orderUpdated": "順序更新成功",
+    "orderFailed": "順序更新失敗",
+    "slugLabel": "網址代碼：",
+    "parentLabel": "上層："
+  },
+  "ArticlesManagement": {
+    "title": "文章管理",
+    "subtitle": "管理所有文章",
+    "addButton": "新增文章",
+    "search": "搜尋文章...",
+    "allStatus": "所有狀態",
+    "publishedOnly": "僅顯示已發布",
+    "draftOnly": "僅顯示草稿",
+    "allVisibility": "所有可見性",
+    "noArticles": "找不到文章",
+    "getStarted": "創建您的第一篇文章以開始使用",
+    "categoryLabel": "分類：",
+    "status": {
+      "published": "已發布",
+      "draft": "草稿"
+    },
+    "visibility": {
+      "public": "公開",
+      "member": "僅限會員",
+      "priority": "優先會員",
+      "memberOnly": "僅限會員"
+    },
+    "actions": {
+      "edit": "編輯",
+      "delete": "刪除",
+      "deleteConfirm": "確定要刪除此文章嗎？"
+    },    "pagination": {
+      "showing": "顯示",
+      "to": "至",
+      "of": "共",
+      "articles": "篇文章",
+      "previous": "上一頁",
+      "next": "下一頁"
+    },    "loading": "載入文章中...",
+    "form": {
+      "back": "返回",
+      "createTitle": "建立新文章",
+      "createDescription": "填寫詳細資料以建立新文章",
+      "editTitle": "編輯文章",
+      "editDescription": "更新以下文章詳細資料",
+      "basicInfo": "基本資訊",
+      "category": "分類",
+      "categoryPlaceholder": "選擇分類",
+      "slug": "網址代碼",
+      "slugPlaceholder": "article-slug",
+      "slugHint": "網址友好識別符（僅限小寫字母、連字符）",
+      "visibility": "可見性",
+      "requiredPriority": "所需優先等級",
+      "requiredMembershipLevel": "所需會員等級",
+      "selectMembershipLevel": "選擇會員等級",
+      "membershipLevelHint": "用戶必須擁有此會員等級或更高等級才能訪問此文章",      "tags": "標籤 / 關鍵字",
+      "tagsPlaceholder": "輸入以逗號分隔的標籤（例如：更年期、健康、保健）",
+      "tagsHint": "添加相關關鍵字以幫助用戶找到此文章。用逗號分隔多個標籤。",      "allMembers": "（所有會員）",
+      "priorityLevel": "優先級",
+      "allMembersHint": "所有會員都可以訪問此文章，無論其會員等級如何",
+      "specificMembersHint": "只有具有此優先級或更高優先級的會員才能訪問此文章",
+      "publicHint": "任何人都可以查看此文章，即使不登錄",
+      "memberHint": "只有登錄的會員才能查看此文章",
+      "priorityHint": "優先級必須介於 1 至 4 之間",      "image": "特色圖片",
+      "publishing": "發布設定",
+      "publishStatus": "發布文章",
+      "publishHint": "已發布的文章將根據可見性設定向用戶顯示",
+      "highlightArticle": "精選文章",
+      "highlightHint": "精選文章將在主頁上顯著展示",
+      "publishDate": "發布日期",
+      "translations": "翻譯",
+      "english": "English",
+      "chinese": "繁體中文",
+      "title": "Title",
+      "titlePlaceholder": "Enter article title",
+      "excerpt": "Excerpt",
+      "excerptPlaceholder": "Brief summary of the article",
+      "description": "Content",
+      "descriptionPlaceholder": "Full article content",
+      "titleZh": "標題",
+      "titlePlaceholderZh": "輸入文章標題",
+      "excerptZh": "摘要",
+      "excerptPlaceholderZh": "文章簡短摘要",
+      "descriptionZh": "內容",
+      "descriptionPlaceholderZh": "完整文章內容",
+      "cancel": "取消",
+      "create": "建立文章",
+      "update": "更新文章",
+      "creating": "建立中...",
+      "updating": "更新中..."
+    }
+  },
   "MainSite": {
     "nav": {
       "home": "首頁",
       "about": "關於我們",
-      "service": "服務",
-      "event": "活動",
+      "service": "服務",      "articles": "文章",      "event": "活動",
       "contact": "聯絡我們",
       "joinNow": "立即加入",
       "dashboard": "儀表板",
@@ -348,11 +551,20 @@
           "role": "社區成員"
         }
       }
-    },
-    "articles": {
+    },    "highlightedArticles": {
+      "badge": "精選內容",
+      "title": "精選文章",
+      "subtitle": "探索我們由專家精選的最重要文章，為您的更年期旅程提供指引。"
+    },    "articles": {
       "badge": "精選文章",
       "title": "關於更年期的所有文章",
       "subtitle": "專家撰寫的文章涵蓋更年期的各個方面，從症狀到解決方案。",
+      "all": "全部",
+      "page": {
+        "badge": "文章",
+        "heading": "瀏覽我們的文章",
+        "description": "探索專家撰寫的文章，涵蓋更年期的各個方面。清晰、相關且最新的資訊，支持您的健康之旅。"
+      },
       "items": {
         "menopause": {
           "title": "更年期為何如此重要",
@@ -368,7 +580,21 @@
         }
       },
       "readMore": "閱讀更多",
-      "viewAll": "查看所有文章"
+      "viewAll": "查看所有文章",
+      "searchPlaceholder": "搜尋文章...",
+      "noArticles": "找不到文章",
+      "backToArticles": "返回文章列表",
+      "relatedArticles": "相關文章",      "minutesRead": "分鐘閱讀",      "errorTitle": "出現錯誤",
+      "noSearchResults": "找不到與\"{search}\"匹配的文章",
+      "searchSuggestion": "請嘗試調整搜索詞或瀏覽其他類別",
+      "noArticlesInCategory": "此類別暫時沒有文章。請稍後再查看！",
+      "noArticlesAvailable": "目前暫時沒有可用文章。請稍後再查看。",
+      "memberOnly": "會員專屬內容",
+      "memberOnlyDescription": "登入或升級會員資格以訪問此文章",
+      "memberOnlyDetailDescription": "此文章僅供會員閱讀。請登入或升級您的會員資格以訪問完整內容。",
+      "cancel": "取消",
+      "signIn": "登入",
+      "viewMembership": "查看會員計劃"
     },
     "footer": {
       "cta": {
@@ -380,6 +606,7 @@
         "home": "首頁",
         "about": "關於我們",
         "service": "服務",
+        "articles": "文章",
         "event": "活動"
       },
       "company": {
@@ -396,5 +623,33 @@
       },
       "copyright": "© 2025 香港更年期協會。保留所有權利。"
     }
+  },
+  "Reviews": {
+    "title": "評論",
+    "writeReview": "撰寫評論",
+    "noReviews": "尚未有評論。成為第一位分享您的想法！",
+    "loadMore": "載入更多評論",
+    "loading": "載入中...",
+    "rating": "評分：",
+    "ratingOverview": "評分概覽",
+    "reply": "回覆",
+    "delete": "刪除",
+    "cancel": "取消",
+    "hide": "隱藏",
+    "show": "顯示",
+    "replyOne": "則回覆",
+    "replyOther": "則回覆",
+    "reviewOne": "則評論",
+    "reviewOther": "則評論",
+    "heartOne": "顆心",
+    "heartOther": "顆心",
+    "confirmDelete": "您確定要刪除此評論嗎？",
+    "mustLogin": "您必須登入才能發表評論",
+    "signIn": "登入",
+    "placeholder": "分享您的想法...",
+    "replyPlaceholder": "撰寫您的回覆...",
+    "postReview": "發表評論",
+    "postReply": "發表回覆",
+    "posting": "發表中..."
   }
 }

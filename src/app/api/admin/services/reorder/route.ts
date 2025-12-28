@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { ServicesService } from '@/features/services/services/services.service';
+import { successResponse, ApiErrors } from '@/lib/api-response';
 
 // POST /api/admin/services/reorder - Bulk update service order (admin only)
 export async function POST(request: NextRequest) {
@@ -9,19 +10,13 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session || session.user?.role !== 'Administrator') {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return ApiErrors.unauthorized();
     }
 
     const body = await request.json();
 
     if (!body.services || !Array.isArray(body.services)) {
-      return NextResponse.json(
-        { error: 'Services array is required' },
-        { status: 400 }
-      );
+      return ApiErrors.validation({ services: 'Must be an array' }, 'Services array is required');
     }
 
     // Validate that each item has id and order
@@ -30,20 +25,14 @@ export async function POST(request: NextRequest) {
     );
 
     if (!isValid) {
-      return NextResponse.json(
-        { error: 'Each service must have id and order' },
-        { status: 400 }
-      );
+      return ApiErrors.validation({ services: 'Each service must have id and order' });
     }
 
     await ServicesService.bulkUpdateOrder(body.services);
 
-    return NextResponse.json({ message: 'Order updated successfully' });
+    return successResponse({ message: 'Order updated successfully' });
   } catch (error) {
     console.error('Error updating service order:', error);
-    return NextResponse.json(
-      { error: 'Failed to update service order' },
-      { status: 500 }
-    );
+    return ApiErrors.internal('Failed to update service order');
   }
 }

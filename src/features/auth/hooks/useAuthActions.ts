@@ -107,13 +107,18 @@ export function useAuthActions() {
       toast.success('Account created successfully!', { id: toastId });
 
       // Auto sign in after registration
-      await nextAuthSignIn('credentials', {
+      const signInResult = await nextAuthSignIn('credentials', {
         email: data.email,
         password: data.password,
         redirect: false,
       });
 
-      router.push('/dashboard');
+      if (signInResult?.error) {
+        throw new Error('Auto sign-in failed');
+      }
+
+      // Redirect to membership page for new free members
+      router.push('/');
       router.refresh();
       return { success: true };
     } catch (err: any) {

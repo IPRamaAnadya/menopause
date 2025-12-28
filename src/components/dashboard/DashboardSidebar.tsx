@@ -28,7 +28,9 @@ import {
   Home,
   Users,
   Layers,
-  HelpCircle
+  HelpCircle,
+  FolderTree,
+  BookOpen
 } from 'lucide-react';
 
 export function DashboardSidebar() {
@@ -122,6 +124,30 @@ export function DashboardSidebar() {
                   <Link href="/dashboard/faq">
                     <HelpCircle className="h-4 w-4" />
                     <span>{t('nav.faqManagement')}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        
+        <SidebarGroup>
+          <SidebarGroupLabel>{t('nav.articleManagement')}</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/dashboard/articles/categories'}>
+                  <Link href="/dashboard/articles/categories">
+                    <FolderTree className="h-4 w-4" />
+                    <span>{t('nav.categoryManagement')}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/dashboard/articles'}>
+                  <Link href="/dashboard/articles">
+                    <BookOpen className="h-4 w-4" />
+                    <span>{t('nav.articlesManagement')}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

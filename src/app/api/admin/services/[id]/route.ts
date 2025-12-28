@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { ServicesService } from '@/features/services/services/services.service';
+import { successResponse, ApiErrors } from '@/lib/api-response';
 
 // GET /api/admin/services/[id] - Get a single service (admin only)
 export async function GET(
@@ -12,10 +13,7 @@ export async function GET(
     const session = await getServerSession(authOptions);
 
     if (!session || session.user?.role !== 'Administrator') {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return ApiErrors.unauthorized();
     }
 
     const { id } = await params;
@@ -25,19 +23,13 @@ export async function GET(
     const service = await ServicesService.getServiceById(parseInt(id), locale);
 
     if (!service) {
-      return NextResponse.json(
-        { error: 'Service not found' },
-        { status: 404 }
-      );
+      return ApiErrors.notFound('Service');
     }
 
-    return NextResponse.json(service);
+    return successResponse(service);
   } catch (error) {
     console.error('Error fetching service:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch service' },
-      { status: 500 }
-    );
+    return ApiErrors.internal('Failed to fetch service');
   }
 }
 
@@ -50,10 +42,7 @@ export async function PUT(
     const session = await getServerSession(authOptions);
 
     if (!session || session.user?.role !== 'Administrator') {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return ApiErrors.unauthorized();
     }
 
     const { id } = await params;
@@ -68,13 +57,10 @@ export async function PUT(
 
     const service = await ServicesService.updateService(parseInt(id), body);
 
-    return NextResponse.json(service);
+    return successResponse(service);
   } catch (error) {
     console.error('Error updating service:', error);
-    return NextResponse.json(
-      { error: 'Failed to update service' },
-      { status: 500 }
-    );
+    return ApiErrors.internal('Failed to update service');
   }
 }
 
@@ -87,21 +73,15 @@ export async function DELETE(
     const session = await getServerSession(authOptions);
 
     if (!session || session.user?.role !== 'Administrator') {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return ApiErrors.unauthorized();
     }
 
     const { id } = await params;
     await ServicesService.deleteService(parseInt(id));
 
-    return NextResponse.json({ message: 'Service deleted successfully' });
+    return successResponse({ message: 'Service deleted successfully' });
   } catch (error) {
     console.error('Error deleting service:', error);
-    return NextResponse.json(
-      { error: 'Failed to delete service' },
-      { status: 500 }
-    );
+    return ApiErrors.internal('Failed to delete service');
   }
 }

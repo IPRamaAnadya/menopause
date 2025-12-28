@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { UserManagementService } from '@/features/user-management/services/user-management.service';
+import { successResponse, ApiErrors } from '@/lib/api-response';
 
 /**
  * GET /api/admin/users/stats
@@ -14,10 +15,7 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions);
     
     if (!session || !session.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return ApiErrors.unauthorized();
     }
 
     // TODO: Check if user has admin role
@@ -33,12 +31,9 @@ export async function GET(request: NextRequest) {
     // Get user statistics
     const stats = await UserManagementService.getUserStats();
 
-    return NextResponse.json(stats, { status: 200 });
+    return successResponse(stats);
   } catch (error) {
     console.error('Error fetching user stats:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return ApiErrors.internal('Internal server error');
   }
 }

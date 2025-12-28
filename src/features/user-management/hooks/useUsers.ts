@@ -31,12 +31,17 @@ export function useUsers(initialFilters: UserFilters = {}) {
         throw new Error('Failed to fetch users');
       }
 
-      const data: PaginatedUsers = await response.json();
+      const result = await response.json();
       
-      setUsers(data.users);
-      setTotal(data.total);
-      setPage(data.page);
-      setTotalPages(data.totalPages);
+      // Handle new API response structure
+      if (!result.success || !result.data) {
+        throw new Error(result.error?.message || 'Failed to fetch users');
+      }
+      
+      setUsers(result.data);
+      setTotal(result.pagination.total);
+      setPage(result.pagination.page);
+      setTotalPages(result.pagination.totalPages);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {

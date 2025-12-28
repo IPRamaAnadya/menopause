@@ -35,9 +35,20 @@ export function useFetch<T = any>(url: string, options?: UseFetchOptions) {
         body: customOptions?.body || options?.body ? JSON.stringify(customOptions?.body || options?.body) : undefined,
       });
       const result = await response.json();
-      setData(result);
-      customOptions?.onSuccess?.(result);
-      options?.onSuccess?.(result);
+      
+      // Handle new API response structure
+      if (result.success && result.data !== undefined) {
+        setData(result.data);
+        customOptions?.onSuccess?.(result.data);
+        options?.onSuccess?.(result.data);
+      } else if (result.error) {
+        throw new Error(result.error.message || 'Request failed');
+      } else {
+        // Fallback for old response format or direct data
+        setData(result);
+        customOptions?.onSuccess?.(result);
+        options?.onSuccess?.(result);
+      }
     } catch (err) {
       setError(err);
       customOptions?.onError?.(err);

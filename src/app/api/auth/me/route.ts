@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { successResponse, ApiErrors } from '@/lib/api-response';
 
 /**
  * GET /api/auth/me
@@ -11,13 +12,10 @@ export async function GET() {
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return ApiErrors.unauthorized();
     }
 
-    return NextResponse.json({
+    return successResponse({
       id: session.user.id,
       email: session.user.email,
       name: session.user.name,
@@ -27,9 +25,6 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Error fetching user info:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return ApiErrors.internal('Internal server error');
   }
 }

@@ -25,7 +25,10 @@
       "mainSite": "Main Site",
       "usersManagement": "Users Management",
       "servicesManagement": "Services Management",
-      "faqManagement": "FAQ Management"
+      "faqManagement": "FAQ Management",
+      "articleManagement": "Article",
+      "categoryManagement": "Category Management",
+      "articlesManagement": "Articles Management"
     },
     "footer": {
       "version": "Version"
@@ -215,6 +218,8 @@
       "titlePlaceholder": "Enter service title",
       "description": "Description",
       "descriptionPlaceholder": "Enter service description",
+      "image": "Image",
+      "imageHint": "Upload an image or enter a URL",
       "imageUrl": "Image URL",
       "imageUrlPlaceholder": "https://example.com/image.jpg",
       "order": "Display Order",
@@ -238,11 +243,216 @@
     },
     "loading": "Loading services..."
   },
+  "FAQManagement": {
+    "title": "FAQ Management",
+    "subtitle": "Manage frequently asked questions",
+    "addButton": "Add FAQ",
+    "search": "Search FAQs...",
+    "allStatus": "All Status",
+    "activeOnly": "Active Only",
+    "inactiveOnly": "Inactive Only",
+    "noFaqs": "No FAQs found",
+    "getStarted": "Get started by creating your first FAQ",
+    "table": {
+      "question": "Question",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "dialog": {
+      "addTitle": "Add New FAQ",
+      "editTitle": "Edit FAQ",
+      "addDescription": "Fill in the details to create a new FAQ",
+      "editDescription": "Update the FAQ details below",
+      "translations": "Translations",
+      "english": "English",
+      "chinese": "繁體中文",
+      "question": "Question",
+      "questionPlaceholder": "English question",
+      "answer": "Answer",
+      "answerPlaceholder": "English answer",
+      "questionZh": "問題",
+      "questionPlaceholderZh": "中文問題",
+      "answerZh": "答案",
+      "answerPlaceholderZh": "中文答案",
+      "activeStatus": "Active Status",
+      "activeHint": "Active FAQs will be visible to users on the website",
+      "cancel": "Cancel",
+      "create": "Create FAQ",
+      "update": "Update FAQ",
+      "creating": "Creating...",
+      "updating": "Updating..."
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteConfirm": "Are you sure you want to delete this FAQ?"
+    },
+    "loading": "Loading FAQs...",
+    "orderUpdated": "Order updated successfully",
+    "orderFailed": "Failed to update order"
+  },
+  "CategoryManagement": {
+    "title": "Category Management",
+    "subtitle": "Manage article categories",
+    "addButton": "Add Category",
+    "search": "Search categories...",
+    "allStatus": "All Status",
+    "activeOnly": "Active Only",
+    "inactiveOnly": "Inactive Only",
+    "noCategories": "No categories found",
+    "getStarted": "Get started by creating your first category",
+    "table": {
+      "category": "Category",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "dialog": {
+      "addTitle": "Add New Category",
+      "editTitle": "Edit Category",
+      "addDescription": "Fill in the details to create a new category",
+      "editDescription": "Update the category details below",
+      "slug": "Slug",
+      "slugPlaceholder": "category-slug",
+      "slugHint": "URL-friendly identifier (lowercase, hyphens only)",
+      "parent": "Parent Category (Optional)",
+      "parentPlaceholder": "Select parent category",
+      "noParent": "No Parent (Top Level)",
+      "translations": "Translations",
+      "english": "English",
+      "chinese": "繁體中文",
+      "name": "Name",
+      "namePlaceholder": "English name",
+      "description": "Description (Optional)",
+      "descriptionPlaceholder": "English description",
+      "nameZh": "名稱",
+      "namePlaceholderZh": "中文名稱",
+      "descriptionZh": "描述（可選）",
+      "descriptionPlaceholderZh": "中文描述",
+      "activeStatus": "Active Status",
+      "activeHint": "Active categories will be visible to users on the website",
+      "cancel": "Cancel",
+      "create": "Create Category",
+      "update": "Update Category",
+      "creating": "Creating...",
+      "updating": "Updating..."
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteConfirm": "Are you sure you want to delete this category? This will also delete all articles in this category."
+    },
+    "loading": "Loading Categories...",
+    "orderUpdated": "Order updated successfully",
+    "orderFailed": "Failed to update order",
+    "slugLabel": "Slug:",
+    "parentLabel": "Parent:"
+  },
+  "ArticlesManagement": {
+    "title": "Articles Management",
+    "subtitle": "Manage all articles",
+    "addButton": "Add Article",
+    "search": "Search articles...",
+    "allStatus": "All Status",
+    "publishedOnly": "Published Only",
+    "draftOnly": "Draft Only",
+    "allVisibility": "All Visibility",
+    "noArticles": "No articles found",
+    "getStarted": "Get started by creating your first article",
+    "categoryLabel": "Category:",
+    "status": {
+      "published": "Published",
+      "draft": "Draft"
+    },
+    "visibility": {
+      "public": "Public",
+      "member": "Member Only",
+      "priority": "Priority Members",
+      "memberOnly": "Member Only"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteConfirm": "Are you sure you want to delete this article?"
+    },
+    "pagination": {
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "articles": "articles",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "loading": "Loading Articles...",
+    "form": {
+      "back": "Back",
+      "createTitle": "Create New Article",
+      "createDescription": "Fill in the details to create a new article",
+      "editTitle": "Edit Article",
+      "editDescription": "Update the article details below",
+      "basicInfo": "Basic Information",
+      "category": "Category",
+      "categoryPlaceholder": "Select a category",
+      "slug": "Slug",
+      "slugPlaceholder": "article-slug",
+      "slugHint": "URL-friendly identifier (lowercase, hyphens only)",
+      "visibility": "Visibility",
+      "requiredPriority": "Required Priority Level",
+      "requiredMembershipLevel": "Required Membership Level",
+      "selectMembershipLevel": "Select membership level",
+      "membershipLevelHint": "Users must have this membership level or higher to access this article",
+      "tags": "Tags / Keywords",
+      "tagsPlaceholder": "Enter tags separated by commas (e.g., menopause, health, wellness)",
+      "tagsHint": "Add relevant keywords to help users find this article. Separate multiple tags with commas.",
+      "allMembers": "(All Members)",
+      "priorityLevel": "Priority",
+      "allMembersHint": "All members can access this article regardless of their membership level",
+      "specificMembersHint": "Only members with this priority level or higher can access this article",
+      "publicHint": "Anyone can view this article, even without logging in",
+      "memberHint": "Only logged-in members can view this article",
+      "priorityHint": "Priority level must be between 1 and 4",
+      "image": "Featured Image",
+      "publishing": "Publishing",
+      "publishStatus": "Publish Article",
+      "publishHint": "Published articles will be visible to users based on visibility settings",
+      "highlightArticle": "Highlight Article",
+      "highlightHint": "Highlighted articles will be featured prominently on the main page",
+      "publishDate": "Publish Date",
+      "translations": "Translations",
+      "english": "English",
+      "chinese": "繁體中文",
+      "title": "Title",
+      "titlePlaceholder": "Enter article title",
+      "excerpt": "Excerpt",
+      "excerptPlaceholder": "Brief summary of the article",
+      "description": "Content",
+      "descriptionPlaceholder": "Full article content",
+      "titleZh": "標題",
+      "titlePlaceholderZh": "輸入文章標題",
+      "excerptZh": "摘要",
+      "excerptPlaceholderZh": "文章簡短摘要",
+      "descriptionZh": "內容",
+      "descriptionPlaceholderZh": "完整文章內容（支援 HTML）",
+      "cancel": "Cancel",
+      "create": "Create Article",
+      "update": "Update Article",
+      "creating": "Creating...",
+      "updating": "Updating..."
+    }
+  },
   "MainSite": {
     "nav": {
       "home": "Home",
       "about": "About",
       "service": "Service",
+      "articles": "Articles",
       "event": "Event",
       "contact": "Contact",
       "joinNow": "Join Now",
@@ -349,10 +559,21 @@
         }
       }
     },
+    "highlightedArticles": {
+      "badge": "Featured Content",
+      "title": "HIGHLIGHTED ARTICLES",
+      "subtitle": "Discover our most important articles handpicked by experts to guide your menopause journey."
+    },
     "articles": {
       "badge": "Interesting Articles",
       "title": "All About Menopause Articles",
       "subtitle": "Expert-led articles covering every aspect of menopause, from symptoms to solutions.",
+      "all": "All",
+      "page": {
+        "badge": "Articles",
+        "heading": "Browse Our Articles",
+        "description": "Explore expert-led articles covering every aspect of menopause. Clear, relevant, and up to date information to support your wellbeing journey."
+      },
       "items": {
         "menopause": {
           "title": "How Menopause is very important",
@@ -368,7 +589,23 @@
         }
       },
       "readMore": "Read more",
-      "viewAll": "View All Articles"
+      "viewAll": "View All Articles",
+      "searchPlaceholder": "Search articles...",
+      "noArticles": "No articles found",
+      "backToArticles": "Back to Articles",
+      "relatedArticles": "Related Articles",
+      "minutesRead": "Minutes Read",
+      "errorTitle": "Something went wrong",
+      "noSearchResults": "We couldn't find any articles matching \"{search}\"",
+      "searchSuggestion": "Try adjusting your search terms or browse other categories",
+      "noArticlesInCategory": "No articles available in this category yet. Check back soon!",
+      "noArticlesAvailable": "No articles are available at the moment. Please check back later.",
+      "memberOnly": "Member Only Content",
+      "memberOnlyDescription": "Sign in or upgrade your membership to access this article",
+      "memberOnlyDetailDescription": "This article is exclusive to members. Sign in or upgrade your membership to access the full content.",
+      "cancel": "Cancel",
+      "signIn": "Sign In",
+      "viewMembership": "View Membership Plans"
     },
     "footer": {
       "cta": {
@@ -380,6 +617,7 @@
         "home": "Home",
         "about": "About",
         "service": "Service",
+        "articles": "Articles",
         "event": "Event"
       },
       "company": {
@@ -396,5 +634,33 @@
       },
       "copyright": "© 2025 The Hong Kong Menopause Society. All rights reserved."
     }
+  },
+  "Reviews": {
+    "title": "Reviews",
+    "writeReview": "Write a Review",
+    "noReviews": "No reviews yet. Be the first to share your thoughts!",
+    "loadMore": "Load More Reviews",
+    "loading": "Loading...",
+    "rating": "Rating:",
+    "ratingOverview": "Rating Overview",
+    "reply": "Reply",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "hide": "Hide",
+    "show": "Show",
+    "replyOne": "reply",
+    "replyOther": "replies",
+    "reviewOne": "review",
+    "reviewOther": "reviews",
+    "heartOne": "heart",
+    "heartOther": "hearts",
+    "confirmDelete": "Are you sure you want to delete this review?",
+    "mustLogin": "You must be logged in to post a review",
+    "signIn": "Sign In",
+    "placeholder": "Share your thoughts...",
+    "replyPlaceholder": "Write your reply...",
+    "postReview": "Post Review",
+    "postReply": "Post Reply",
+    "posting": "Posting..."
   }
 }

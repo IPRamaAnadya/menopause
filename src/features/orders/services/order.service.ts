@@ -149,24 +149,33 @@ export class OrderService {
     payload: string | Buffer,
     signature: string
   ) {
+    console.log('========================================');
+    console.log('[processWebhook] Starting webhook processing');
+    console.log('[processWebhook] Provider:', provider);
+    console.log('========================================');
+    
     const paymentProvider = paymentProviderFactory.getProvider(provider);
     
     // Verify and parse webhook
     const { event, data } = await paymentProvider.processWebhook(payload, signature);
 
     // Handle based on event type
-    console.log(`Processing webhook event: ${event}`);
+    console.log(`[processWebhook] Event type: ${event}`);
+    console.log('[processWebhook] Event data keys:', Object.keys(data));
 
     
     if (event.includes('checkout.session.completed')) {
+      console.log('[processWebhook] Handling checkout.session.completed');
       return this.handleCheckoutSessionCompleted(data);
     } else if (event.includes('payment_intent.succeeded') || event.includes('charge.succeeded')) {
+      console.log('[processWebhook] Handling payment success');
       return this.handlePaymentSuccess(data);
     } else if (event.includes('payment_intent.payment_failed') || event.includes('charge.failed')) {
+      console.log('[processWebhook] Handling payment failure');
       return this.handlePaymentFailure(data);
     }
 
-    console.log(`Webhook event ${event} not handled - no action required`);
+    console.log(`[processWebhook] Event ${event} not handled - no action required`);
     return { processed: true, event };
   }
 
@@ -250,18 +259,36 @@ export class OrderService {
 
     // Get order details to check if this is a membership order
     const order = await orderRepository.findById(payment.order_id);
+    console.log('[handleCheckoutSessionCompleted] Order details:', {
+      orderId: order?.id,
+      userId: order?.userId,
+      metadata: order?.metadata
+    });
+    
     if (order && order.metadata) {
       const metadata = order.metadata as any;
       
+      console.log('[handleCheckoutSessionCompleted] Checking metadata:', {
+        membership_level_id: metadata.membership_level_id,
+        operation_type: metadata.operation_type,
+        hasLevel: !!metadata.membership_level_id,
+        hasOperation: !!metadata.operation_type
+      });
+      
       // Process membership changes
       if (metadata.membership_level_id && metadata.operation_type) {
-        console.log('Processing membership change:', metadata);
+        console.log('[handleCheckoutSessionCompleted] Processing membership change...');
         await this.processMembershipChange(
           order.userId,
           parseInt(metadata.membership_level_id),
           metadata.operation_type
         );
+        console.log('[handleCheckoutSessionCompleted] ✓ Membership change processed');
+      } else {
+        console.log('[handleCheckoutSessionCompleted] No membership metadata found - skipping membership processing');
       }
+    } else {
+      console.log('[handleCheckoutSessionCompleted] No order or metadata found');
     }
     
     return { success: true, orderId: payment.order_id };
@@ -277,37 +304,62 @@ export class OrderService {
   ) {
     const MembershipService = (await import('@/features/membership/services/membership.service')).MembershipService;
 
+    console.log(`[processMembershipChange] Starting for user ${userId}, level ${membershipLevelId}, operation: ${operationType}`);
+
     try {
       if (operationType === 'EXTEND') {
+        console.log(`[processMembershipChange] Extending membership...`);
         await MembershipService.extendMembership(userId, membershipLevelId);
-        console.log(`Extended membership for user ${userId}`);
+        console.log(`[processMembershipChange] ✓ Extended membership for user ${userId}`);
       } else if (operationType === 'UPGRADE') {
+        console.log(`[processMembershipChange] Upgrading membership...`);
         await MembershipService.changeMembershipLevel(userId, membershipLevelId, 'UPGRADE');
-        console.log(`Upgraded membership for user ${userId}`);
+        console.log(`[processMembershipChange] ✓ Upgraded membership for user ${userId}`);
       } else if (operationType === 'DOWNGRADE') {
+        console.log(`[processMembershipChange] Downgrading membership...`);
         await MembershipService.changeMembershipLevel(userId, membershipLevelId, 'DOWNGRADE');
-        console.log(`Downgraded membership for user ${userId}`);
+        console.log(`[processMembershipChange] ✓ Downgraded membership for user ${userId}`);
       } else if (operationType === 'NEW') {
+        console.log(`[processMembershipChange] Creating new membership...`);
         // For new membership, calculate dates
         const levels = await MembershipService.getAvailableMembershipLevels();
         const level = levels.find(l => l.id === membershipLevelId);
         
-        if (level) {
-          const startDate = new Date();
-          const endDate = new Date(startDate);
-          endDate.setDate(endDate.getDate() + level.duration_days);
-
-          await MembershipService.createMembership({
-            user_id: userId,
-            membership_level_id: membershipLevelId,
-            start_date: startDate,
-            end_date: endDate,
-          });
-          console.log(`Created new membership for user ${userId}`);
+        if (!level) {
+          console.error(`[processMembershipChange] ERROR: Level ${membershipLevelId} not found`);
+          throw new Error(`Membership level ${membershipLevelId} not found`);
         }
+
+        const startDate = new Date();
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + level.duration_days);
+
+        console.log(`[processMembershipChange] Creating membership with dates:`, {
+          startDate,
+          endDate,
+          durationDays: level.duration_days
+        });
+
+        const result = await MembershipService.createMembership({
+          user_id: userId,
+          membership_level_id: membershipLevelId,
+          start_date: startDate,
+          end_date: endDate,
+        });
+
+        console.log(`[processMembershipChange] ✓ Created new membership ${result.id} for user ${userId}`);
+      } else {
+        console.error(`[processMembershipChange] ERROR: Unknown operation type: ${operationType}`);
       }
     } catch (error) {
-      console.error('Error processing membership change:', error);
+      console.error(`[processMembershipChange] ERROR processing membership change:`, error);
+      console.error(`[processMembershipChange] Error details:`, {
+        userId,
+        membershipLevelId,
+        operationType,
+        errorMessage: error instanceof Error ? error.message : String(error),
+        errorStack: error instanceof Error ? error.stack : undefined
+      });
       // Don't throw - we already marked payment as succeeded
     }
   }

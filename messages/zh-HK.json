@@ -892,7 +892,10 @@
       "paymentCancelled": "付款已取消",
       "paymentCancelledDescription": "您的付款已取消。您可以在準備好後再試一次。",
       "noChargesMade": "您的帳戶未被收取任何費用",
-      "tryAgain": "再試一次"
+      "tryAgain": "再試一次",
+      "activityHistory": "會籍活動記錄",
+      "activityDescription": "查看您的會籍交易歷史",
+      "noActivity": "尚無會籍活動記錄"
     },
     "events": {
       "title": "活動",
@@ -925,6 +928,27 @@
       "language": "語言與地區",
       "languageDescription": "自訂您的語言偏好設定",
       "languageInfo": "使用導覽列中的語言切換器來變更語言"
+    }
+  },
+  "Admin": {
+    "memberships": {
+      "overview": "會籍總覽",
+      "overviewDescription": "查看所有會員及其會籍狀態",
+      "membersList": "會員清單",
+      "membersDescription": "會員及其最後會籍詳情",
+      "searchPlaceholder": "按姓名或電郵搜尋...",
+      "search": "搜尋",
+      "member": "會員",
+      "membershipLevel": "會籍等級",
+      "status": "狀態",
+      "startDate": "開始日期",
+      "endDate": "結束日期",
+      "price": "價格",
+      "noMembers": "找不到會員",
+      "noMembership": "無會籍",
+      "showing": "顯示第 {from} 至 {to} 項，共 {total} 位會員",
+      "previous": "上一頁",
+      "next": "下一頁"
     }
   }
 }

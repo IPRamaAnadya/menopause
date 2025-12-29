@@ -192,6 +192,7 @@ enum MembershipStatus {
   ACTIVE
   EXPIRED
   CANCELLED
+  STOPPED
 }
 
 enum UserStatus {

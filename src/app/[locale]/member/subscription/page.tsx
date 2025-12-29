@@ -27,6 +27,26 @@ interface CurrentMembership {
   membership_level: MembershipLevel;
 }
 
+interface SubscriptionActivity {
+  id: number;
+  user_id: number;
+  membership_id: number;
+  membership: {
+    id: number;
+    status: string;
+    start_date: string;
+    end_date: string;
+    membership_level: {
+      id: number;
+      name: string;
+      price: number;
+    };
+  };
+  activity_type: string;
+  description: string;
+  created_at: string;
+}
+
 export default function SubscriptionPage() {
   const t = useTranslations("Member");
   const { toast } = useToast();
@@ -34,6 +54,7 @@ export default function SubscriptionPage() {
   const [processing, setProcessing] = useState(false);
   const [currentMembership, setCurrentMembership] = useState<CurrentMembership | null>(null);
   const [availableLevels, setAvailableLevels] = useState<MembershipLevel[]>([]);
+  const [activities, setActivities] = useState<SubscriptionActivity[]>([]);
 
   useEffect(() => {
     fetchData();
@@ -41,13 +62,15 @@ export default function SubscriptionPage() {
 
   const fetchData = async () => {
     try {
-      const [membershipRes, levelsRes] = await Promise.all([
+      const [membershipRes, levelsRes, activityRes] = await Promise.all([
         fetch('/api/member/memberships/current'),
         fetch('/api/member/memberships/available'),
+        fetch('/api/member/subscription/activity'),
       ]);
 
       const membershipData = await membershipRes.json();
       const levelsData = await levelsRes.json();
+      const activityData = await activityRes.json();
 
       if (membershipData.success) {
         setCurrentMembership(membershipData.data);
@@ -55,6 +78,10 @@ export default function SubscriptionPage() {
 
       if (levelsData.success) {
         setAvailableLevels(levelsData.data);
+      }
+
+      if (activityData.success) {
+        setActivities(activityData.data);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -256,19 +283,78 @@ export default function SubscriptionPage() {
         </div>
       )}
 
-      {/* Payment History */}
+      {/* Subscription Activity */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CreditCard className="h-5 w-5" />
-            {t("subscription.paymentHistory")}
+            {t("subscription.activityHistory")}
           </CardTitle>
-          <CardDescription>{t("subscription.paymentDescription")}</CardDescription>
+          <CardDescription>{t("subscription.activityDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 text-muted-foreground">
-            {t("subscription.noPayments")}
-          </div>
+          {activities.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              {t("subscription.noActivity")}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {activities.map((activity) => (
+                <div
+                  key={activity.id}
+                  className="flex items-start justify-between border-b pb-4 last:border-0"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant={
+                          activity.activity_type === 'NEW' || activity.activity_type === 'EXTEND' || activity.activity_type === 'UPGRADE'
+                            ? 'default'
+                            : activity.activity_type === 'DOWNGRADE'
+                            ? 'secondary'
+                            : activity.activity_type === 'CANCELLED'
+                            ? 'destructive'
+                            : 'outline'
+                        }
+                      >
+                        {activity.activity_type}
+                      </Badge>
+                      <span className="font-medium">
+                        {activity.membership.membership_level.name}
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {activity.description}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(activity.created_at).toLocaleDateString()} -{' '}
+                      {new Date(activity.membership.start_date).toLocaleDateString()} to{' '}
+                      {new Date(activity.membership.end_date).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold">
+                      HK${activity.membership.membership_level.price.toFixed(2)}
+                    </p>
+                    <Badge 
+                      variant={
+                        activity.membership.status === 'ACTIVE' 
+                          ? 'default' 
+                          : activity.membership.status === 'STOPPED'
+                          ? 'outline'
+                          : activity.membership.status === 'CANCELLED'
+                          ? 'destructive'
+                          : 'secondary'
+                      } 
+                      className="mt-1"
+                    >
+                      {activity.membership.status}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

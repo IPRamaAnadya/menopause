@@ -905,7 +905,10 @@
       "paymentCancelled": "Payment Cancelled",
       "paymentCancelledDescription": "Your payment was cancelled. You can try again when you're ready.",
       "noChargesMade": "No charges have been made to your account",
-      "tryAgain": "Try Again"
+      "tryAgain": "Try Again",
+      "activityHistory": "Subscription Activity",
+      "activityDescription": "View your membership transaction history",
+      "noActivity": "No subscription activity yet"
     },
     "events": {
       "title": "Events",
@@ -938,6 +941,27 @@
       "language": "Language & Region",
       "languageDescription": "Customize your language preferences",
       "languageInfo": "Use the language switcher in the navigation to change languages"
+    }
+  },
+  "Admin": {
+    "memberships": {
+      "overview": "Membership Overview",
+      "overviewDescription": "View all members and their membership status",
+      "membersList": "Members List",
+      "membersDescription": "Members with their last membership details",
+      "searchPlaceholder": "Search by name or email...",
+      "search": "Search",
+      "member": "Member",
+      "membershipLevel": "Membership Level",
+      "status": "Status",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "price": "Price",
+      "noMembers": "No members found",
+      "noMembership": "No membership",
+      "showing": "Showing {from} to {to} of {total} members",
+      "previous": "Previous",
+      "next": "Next"
     }
   }
 }

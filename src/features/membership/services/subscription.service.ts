@@ -227,16 +227,21 @@ export class SubscriptionService {
    * Get subscription activity for a specific user
    */
   static async getUserSubscriptionActivity(userId: number) {
-    const memberships = await prisma.memberships.findMany({
+    // Get all orders with payments for this user that are membership-related
+    const orders = await prisma.orders.findMany({
       where: {
         user_id: userId,
+        order_type: {
+          in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE'],
+        },
       },
       include: {
-        users: {
+        payments: {
           select: {
             id: true,
-            name: true,
-            email: true,
+            amount: true,
+            status: true,
+            metadata: true,
           },
         },
         membership_levels: {
@@ -252,25 +257,59 @@ export class SubscriptionService {
       },
     });
 
-    return memberships.map(m => ({
-      id: m.id,
-      user_id: m.user_id,
-      user: m.users,
-      membership_id: m.id,
-      membership: {
-        id: m.id,
-        status: m.status,
-        start_date: m.start_date,
-        end_date: m.end_date,
-        membership_level: {
-          id: m.membership_levels.id,
-          name: m.membership_levels.name,
-          price: parseFloat(m.membership_levels.price.toString()),
-        },
-      },
-      activity_type: m.status === 'CANCELLED' ? 'CANCELLED' : m.status === 'EXPIRED' ? 'EXPIRED' : 'ACTIVE',
-      description: `${m.membership_levels.name} - ${m.status}`,
-      created_at: m.created_at,
-    }));
+    // Map orders to activities
+    const activities = await Promise.all(
+      orders.map(async (order) => {
+        // Get the payment metadata to find operation type and membership ID
+        const payment = order.payments[0];
+        const metadata = payment?.metadata as any;
+        
+        // Determine activity type from order type and metadata
+        let activityType: 'NEW' | 'EXTEND' | 'UPGRADE' | 'DOWNGRADE' | 'CANCELLED' | 'EXPIRED' = 'NEW';
+        if (metadata?.operation_type) {
+          activityType = metadata.operation_type;
+        } else if (order.order_type === 'MEMBERSHIP_RENEWAL') {
+          activityType = 'EXTEND';
+        } else if (order.order_type === 'MEMBERSHIP_UPGRADE') {
+          activityType = 'UPGRADE';
+        } else if (order.order_type === 'MEMBERSHIP_PURCHASE') {
+          activityType = 'NEW';
+        }
+
+        // Get the membership created/updated by this order
+        let membershipStatus = 'ACTIVE';
+        if (metadata?.membership_id) {
+          const membership = await prisma.memberships.findUnique({
+            where: { id: parseInt(metadata.membership_id) },
+            select: { status: true },
+          });
+          if (membership) {
+            membershipStatus = membership.status;
+          }
+        }
+
+        return {
+          id: order.id,
+          user_id: order.user_id,
+          membership_id: metadata?.membership_id || null,
+          membership: {
+            id: metadata?.membership_id || order.id,
+            status: membershipStatus,
+            start_date: order.created_at,
+            end_date: new Date(new Date(order.created_at).setMonth(new Date(order.created_at).getMonth() + 1)),
+            membership_level: {
+              id: order.membership_levels?.id || 0,
+              name: order.membership_levels?.name || 'Unknown',
+              price: order.total_amount ? parseFloat(order.total_amount.toString()) : 0,
+            },
+          },
+          activity_type: activityType,
+          description: `${order.membership_levels?.name || 'Membership'} - ${activityType}`,
+          created_at: order.created_at,
+        };
+      })
+    );
+
+    return activities;
   }
 }

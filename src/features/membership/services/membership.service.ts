@@ -1,11 +1,12 @@
 import { prisma } from '@/lib/prisma';
-import { OrderType } from '@/generated/prisma';
+import { OrderType, MembershipStatus as PrismaMembershipStatus } from '@/generated/prisma';
 import { CreateMembershipInput, MembershipStatus, UpdateMembershipInput } from '../types';
 import { orderService } from '@/features/orders/services/order.service';
 
 export class MembershipService {
   /**
    * Get all memberships with user and level details
+   * Returns only the latest membership per user
    */
   static async getAllMemberships(options?: {
     page?: number;
@@ -17,77 +18,89 @@ export class MembershipService {
     const limit = options?.limit || 10;
     const skip = (page - 1) * limit;
 
-    const where: any = {};
-
-    if (options?.status) {
-      where.status = options.status;
-    }
-
+    // Build user filter for search
+    const userWhere: any = {};
     if (options?.search) {
-      where.OR = [
+      userWhere.OR = [
         {
-          users: {
-            name: {
-              contains: options.search,
-              mode: 'insensitive',
-            },
+          name: {
+            contains: options.search,
+            mode: 'insensitive',
           },
         },
         {
-          users: {
-            email: {
-              contains: options.search,
-              mode: 'insensitive',
-            },
+          email: {
+            contains: options.search,
+            mode: 'insensitive',
           },
         },
       ];
     }
 
-    const [memberships, total] = await Promise.all([
-      prisma.memberships.findMany({
-        where,
-        include: {
-          users: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
+    // Get all users with memberships
+    const users = await prisma.users.findMany({
+      where: userWhere,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
+
+    // For each user, get their latest membership
+    const latestMemberships = await Promise.all(
+      users.map(async (user) => {
+        const membership = await prisma.memberships.findFirst({
+          where: {
+            user_id: user.id,
+            ...(options?.status && { status: options.status }),
+          },
+          include: {
+            membership_levels: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                price: true,
+                duration_days: true,
+              },
             },
           },
-          membership_levels: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              price: true,
-              duration_days: true,
-            },
+          orderBy: {
+            created_at: 'desc',
           },
-        },
-        orderBy: {
-          created_at: 'desc',
-        },
-        skip,
-        take: limit,
-      }),
-      prisma.memberships.count({ where }),
-    ]);
+        });
+
+        return membership ? { ...membership, users: user } : null;
+      })
+    );
+
+    // Filter out null values (users without memberships)
+    const validMemberships = latestMemberships.filter(m => m !== null);
+
+    // Sort by created_at desc
+    validMemberships.sort((a, b) => {
+      return new Date(b!.created_at).getTime() - new Date(a!.created_at).getTime();
+    });
+
+    // Apply pagination
+    const total = validMemberships.length;
+    const paginatedMemberships = validMemberships.slice(skip, skip + limit);
 
     return {
-      data: memberships.map(m => ({
-        id: m.id,
-        user_id: m.user_id,
-        membership_level_id: m.membership_level_id,
-        start_date: m.start_date,
-        end_date: m.end_date,
-        status: m.status,
-        created_at: m.created_at,
-        updated_at: m.updated_at,
-        user: m.users,
+      data: paginatedMemberships.map(m => ({
+        id: m!.id,
+        user_id: m!.user_id,
+        membership_level_id: m!.membership_level_id,
+        start_date: m!.start_date,
+        end_date: m!.end_date,
+        status: m!.status,
+        created_at: m!.created_at,
+        updated_at: m!.updated_at,
+        user: m!.users,
         membership_level: {
-          ...m.membership_levels,
-          price: parseFloat(m.membership_levels.price.toString()),
+          ...m!.membership_levels,
+          price: parseFloat(m!.membership_levels.price.toString()),
         },
       })),
       pagination: {
@@ -150,16 +163,19 @@ export class MembershipService {
    * Create a new membership
    */
   static async createMembership(data: CreateMembershipInput) {
+    console.log('[createMembership] Starting for user', data.user_id);
+    
     // Check if user exists
     const user = await prisma.users.findUnique({
       where: { id: data.user_id },
     });
 
     if (!user) {
+      console.error('[createMembership] User not found:', data.user_id);
       throw new Error('User not found');
     }
 
-    // Check if user already has an active membership
+    // Check if user already has an ACTIVE membership
     const existingActiveMembership = await prisma.memberships.findFirst({
       where: {
         user_id: data.user_id,
@@ -168,6 +184,7 @@ export class MembershipService {
     });
 
     if (existingActiveMembership) {
+      console.error('[createMembership] User already has active membership:', existingActiveMembership.id);
       throw new Error('User already has an active membership. Please edit the existing membership instead.');
     }
 
@@ -177,6 +194,7 @@ export class MembershipService {
     });
 
     if (!level) {
+      console.error('[createMembership] Membership level not found:', data.membership_level_id);
       throw new Error('Membership level not found');
     }
 
@@ -185,6 +203,14 @@ export class MembershipService {
     const endDate = data.end_date 
       ? new Date(data.end_date) 
       : new Date(startDate.getTime() + level.duration_days * 24 * 60 * 60 * 1000);
+
+    console.log('[createMembership] Creating membership with:', {
+      userId: data.user_id,
+      levelId: data.membership_level_id,
+      levelName: level.name,
+      startDate,
+      endDate
+    });
 
     // Create membership
     const membership = await prisma.memberships.create({
@@ -214,6 +240,8 @@ export class MembershipService {
         },
       },
     });
+
+    console.log('[createMembership] Membership created successfully:', membership.id);
 
     // Create order and payment for this membership (admin created)
     try {
@@ -468,13 +496,37 @@ export class MembershipService {
 
   /**
    * Extend current membership - adds duration to existing end date
+   * Works with ACTIVE or EXPIRED memberships
    */
   static async extendMembership(userId: number, membershipLevelId: number) {
-    const currentMembership = await this.getUserActiveMembership(userId);
+    console.log('[extendMembership] Starting for user', userId, 'level', membershipLevelId);
+    
+    // Get current membership (ACTIVE or EXPIRED)
+    const currentMembership = await prisma.memberships.findFirst({
+      where: {
+        user_id: userId,
+        status: {
+          in: ['ACTIVE', 'EXPIRED'],
+        },
+      },
+      include: {
+        membership_levels: true,
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+    });
     
     if (!currentMembership) {
-      throw new Error('No active membership found to extend');
+      console.error('[extendMembership] No membership found to extend');
+      throw new Error('No membership found to extend');
     }
+
+    console.log('[extendMembership] Found membership:', {
+      id: currentMembership.id,
+      status: currentMembership.status,
+      currentEndDate: currentMembership.end_date
+    });
 
     // Get the membership level to extend with
     const level = await prisma.membership_levels.findUnique({
@@ -482,6 +534,7 @@ export class MembershipService {
     });
 
     if (!level) {
+      console.error('[extendMembership] Membership level not found:', membershipLevelId);
       throw new Error('Membership level not found');
     }
 
@@ -490,16 +543,29 @@ export class MembershipService {
     const newEndDate = new Date(currentEndDate);
     newEndDate.setDate(newEndDate.getDate() + level.duration_days);
 
-    // Update existing membership
+    console.log('[extendMembership] Extending membership:', {
+      oldEndDate: currentEndDate,
+      newEndDate: newEndDate,
+      daysAdded: level.duration_days
+    });
+
+    // Update existing membership and set status to ACTIVE
     const updatedMembership = await prisma.memberships.update({
       where: { id: currentMembership.id },
       data: {
         end_date: newEndDate,
+        status: PrismaMembershipStatus.ACTIVE,
         updated_at: new Date(),
       },
       include: {
         membership_levels: true,
       },
+    });
+
+    console.log('[extendMembership] Membership extended successfully:', {
+      id: updatedMembership.id,
+      newEndDate: updatedMembership.end_date,
+      status: updatedMembership.status
     });
 
     return {
@@ -520,6 +586,7 @@ export class MembershipService {
 
   /**
    * Change membership level (upgrade or downgrade)
+   * Creates a NEW membership and sets old one to STOPPED
    * Duration follows the new level's duration from today
    */
   static async changeMembershipLevel(
@@ -527,10 +594,24 @@ export class MembershipService {
     newMembershipLevelId: number,
     type: 'UPGRADE' | 'DOWNGRADE'
   ) {
-    const currentMembership = await this.getUserActiveMembership(userId);
+    // Get current membership (any status, not just ACTIVE)
+    const currentMembership = await prisma.memberships.findFirst({
+      where: {
+        user_id: userId,
+        status: {
+          in: ['ACTIVE', 'EXPIRED'],
+        },
+      },
+      include: {
+        membership_levels: true,
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+    });
     
     if (!currentMembership) {
-      throw new Error('No active membership found to change');
+      throw new Error('No membership found to change');
     }
 
     if (currentMembership.membership_level_id === newMembershipLevelId) {
@@ -547,11 +628,11 @@ export class MembershipService {
     }
 
     // Validate upgrade/downgrade based on priority
-    if (type === 'UPGRADE' && newLevel.priority <= currentMembership.membership_level.priority) {
+    if (type === 'UPGRADE' && newLevel.priority <= currentMembership.membership_levels.priority) {
       throw new Error('New level must be higher priority for upgrade');
     }
 
-    if (type === 'DOWNGRADE' && newLevel.priority >= currentMembership.membership_level.priority) {
+    if (type === 'DOWNGRADE' && newLevel.priority >= currentMembership.membership_levels.priority) {
       throw new Error('New level must be lower priority for downgrade');
     }
 
@@ -560,32 +641,71 @@ export class MembershipService {
     const endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + newLevel.duration_days);
 
-    // Update membership with new level and dates
-    const updatedMembership = await prisma.memberships.update({
-      where: { id: currentMembership.id },
-      data: {
-        membership_level_id: newMembershipLevelId,
-        start_date: startDate,
-        end_date: endDate,
-        updated_at: new Date(),
-      },
-      include: {
-        membership_levels: true,
-      },
+    console.log('[changeMembershipLevel] Starting transaction for user', userId);
+    console.log('[changeMembershipLevel] Old membership:', {
+      id: currentMembership.id,
+      status: currentMembership.status,
+      level: currentMembership.membership_levels.name
     });
 
+    // Use transaction to ensure atomicity
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Set old membership to STOPPED
+      console.log('[changeMembershipLevel] Setting old membership to STOPPED');
+      await tx.memberships.update({
+        where: { id: currentMembership.id },
+        data: {
+          status: PrismaMembershipStatus.STOPPED,
+          updated_at: new Date(),
+        },
+      });
+
+      // 2. Create new membership
+      console.log('[changeMembershipLevel] Creating new membership', {
+        userId,
+        levelId: newMembershipLevelId,
+        startDate,
+        endDate
+      });
+      
+      const newMembership = await tx.memberships.create({
+        data: {
+          user_id: userId,
+          membership_level_id: newMembershipLevelId,
+          start_date: startDate,
+          end_date: endDate,
+          status: PrismaMembershipStatus.ACTIVE,
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        include: {
+          membership_levels: true,
+        },
+      });
+
+      console.log('[changeMembershipLevel] New membership created:', {
+        id: newMembership.id,
+        status: newMembership.status,
+        level: newMembership.membership_levels.name
+      });
+
+      return newMembership;
+    });
+
+    console.log('[changeMembershipLevel] Transaction completed successfully');
+
     return {
-      id: updatedMembership.id,
-      user_id: updatedMembership.user_id,
-      membership_level_id: updatedMembership.membership_level_id,
-      start_date: updatedMembership.start_date,
-      end_date: updatedMembership.end_date,
-      status: updatedMembership.status,
-      created_at: updatedMembership.created_at,
-      updated_at: updatedMembership.updated_at,
+      id: result.id,
+      user_id: result.user_id,
+      membership_level_id: result.membership_level_id,
+      start_date: result.start_date,
+      end_date: result.end_date,
+      status: result.status,
+      created_at: result.created_at,
+      updated_at: result.updated_at,
       membership_level: {
-        ...updatedMembership.membership_levels,
-        price: parseFloat(updatedMembership.membership_levels.price.toString()),
+        ...result.membership_levels,
+        price: parseFloat(result.membership_levels.price.toString()),
       },
     };
   }

@@ -6,9 +6,11 @@ import { successResponse, ApiErrors } from '@/lib/api-response';
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { publicId: string } }
+  { params }: { params: Promise<{ publicId: string }> }
 ) {
   try {
+    const { publicId } = await params;
+    
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return ApiErrors.unauthorized('Please login to cancel order');
@@ -17,12 +19,12 @@ export async function POST(
     const userId = parseInt(session.user.id);
     
     // Verify user owns this order
-    const order = await orderService.getOrder(params.publicId);
+    const order = await orderService.getOrder(publicId);
     if (order.userId !== userId) {
       return ApiErrors.forbidden('You do not have access to this order');
     }
 
-    const result = await orderService.cancelOrder(params.publicId);
+    const result = await orderService.cancelOrder(publicId);
 
     return successResponse(result);
   } catch (error: any) {

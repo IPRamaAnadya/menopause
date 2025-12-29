@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn as nextAuthSignIn, signOut as nextAuthSignOut } from 'next-auth/react';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import { SignInFormData, SignUpFormData } from '../types';
 import { getAuthErrorMessage, isValidEmail, validatePassword, passwordsMatch } from '../utils/validation';
 
@@ -16,10 +16,9 @@ export function useAuthActions() {
     setLoading(true);
     setError(null);
 
-    const toastId = toast.loading('Signing in...');
-
     try {
       if (!isValidEmail(data.email)) {
+        toast.error('Please enter a valid email address.');
         throw new Error('Please enter a valid email address.');
       }
 
@@ -30,10 +29,11 @@ export function useAuthActions() {
       });
 
       if (result?.error) {
+        toast.error(result.error);
         throw new Error(result.error);
       }
 
-      toast.success('Successfully signed in!', { id: toastId });
+      toast.success('Successfully signed in!');
 
       // Fetch user details to check password reset and role
       const response = await fetch('/api/auth/me');
@@ -58,7 +58,6 @@ export function useAuthActions() {
     } catch (err: any) {
       const errorMessage = err.message || 'Sign in failed';
       setError(errorMessage);
-      toast.error(errorMessage, { id: toastId });
       return { success: false, error: errorMessage };
     } finally {
       setLoading(false);
@@ -69,19 +68,20 @@ export function useAuthActions() {
     setLoading(true);
     setError(null);
 
-    const toastId = toast.loading('Creating your account...');
-
     try {
       if (!isValidEmail(data.email)) {
+        toast.error('Please enter a valid email address.');
         throw new Error('Please enter a valid email address.');
       }
 
       const passwordValidation = validatePassword(data.password);
       if (!passwordValidation.isValid) {
+        toast.error(passwordValidation.message);
         throw new Error(passwordValidation.message);
       }
 
       if (!passwordsMatch(data.password, data.confirmPassword)) {
+        toast.error('Passwords do not match.');
         throw new Error('Passwords do not match.');
       }
 
@@ -101,10 +101,11 @@ export function useAuthActions() {
       const result = await response.json();
 
       if (!response.ok) {
+        toast.error(result.error || 'Registration failed');
         throw new Error(result.error || 'Registration failed');
       }
 
-      toast.success('Account created successfully!', { id: toastId });
+      toast.success('Account created successfully!');
 
       // Auto sign in after registration
       const signInResult = await nextAuthSignIn('credentials', {
@@ -114,6 +115,7 @@ export function useAuthActions() {
       });
 
       if (signInResult?.error) {
+        toast.error('Auto sign-in failed');
         throw new Error('Auto sign-in failed');
       }
 
@@ -124,7 +126,6 @@ export function useAuthActions() {
     } catch (err: any) {
       const errorMessage = err.message || 'Sign up failed';
       setError(errorMessage);
-      toast.error(errorMessage, { id: toastId });
       return { success: false, error: errorMessage };
     } finally {
       setLoading(false);
@@ -173,19 +174,18 @@ export function useAuthActions() {
     setLoading(true);
     setError(null);
 
-    const toastId = toast.loading('Sending password reset email...');
-
     try {
       if (!isValidEmail(email)) {
+        toast.error('Please enter a valid email address.');
         throw new Error('Please enter a valid email address.');
       }
 
       // TODO: Implement password reset endpoint
+      toast.error('Password reset not yet implemented');
       throw new Error('Password reset not yet implemented');
     } catch (err: any) {
       const errorMessage = err.message || 'Password reset failed';
       setError(errorMessage);
-      toast.error(errorMessage, { id: toastId });
       return { success: false, error: errorMessage };
     } finally {
       setLoading(false);

@@ -26,6 +26,11 @@
       "usersManagement": "Users Management",
       "servicesManagement": "Services Management",
       "faqManagement": "FAQ Management",
+      "membershipManagement": "Membership",
+      "membershipOverview": "Membership Overview",
+      "membershipLevel": "Membership Level",
+      "membership": "Membership",
+      "memberSubscription": "Member Subscription",
       "articleManagement": "Article",
       "categoryManagement": "Category Management",
       "articlesManagement": "Articles Management"
@@ -50,6 +55,52 @@
     "recentActivity": {
       "title": "Recent Activity",
       "placeholder": "No recent activity to display."
+    }
+  },
+  "MembershipLevels": {
+    "title": "Membership Levels",
+    "description": "Manage membership tiers and pricing",
+    "loading": "Loading...",
+    "noData": "No membership levels found",
+    "table": {
+      "priority": "Priority",
+      "name": "Name",
+      "slug": "Slug",
+      "price": "Price",
+      "duration": "Duration",
+      "days": "days",
+      "actions": "Actions"
+    },
+    "search": {
+      "placeholder": "Search by name or slug..."
+    },
+    "actions": {
+      "add": "Add Level",
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "create": "Create",
+      "update": "Update",
+      "saving": "Saving...",
+      "deleteConfirm": "Are you sure you want to delete this membership level? This action cannot be undone."
+    },
+    "dialog": {
+      "addTitle": "Add Membership Level",
+      "addDescription": "Create a new membership tier for your members",
+      "editTitle": "Edit Membership Level",
+      "editDescription": "Update membership tier information"
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "e.g., Premium",
+      "slug": "Slug",
+      "slugPlaceholder": "e.g., premium",
+      "slugHint": "URL-friendly identifier (lowercase, no spaces)",
+      "priority": "Priority",
+      "priorityHint": "Higher number = higher priority",
+      "price": "Price",
+      "duration": "Duration (Days)",
+      "durationHint": "Membership validity period in days"
     }
   },
   "Auth": {
@@ -662,5 +713,104 @@
     "postReview": "Post Review",
     "postReply": "Post Reply",
     "posting": "Posting..."
+  },
+  "Memberships": {
+    "title": "Memberships",
+    "description": "Manage user memberships and subscriptions",
+    "loading": "Loading...",
+    "noData": "No memberships found",
+    "status": {
+      "ACTIVE": "Active",
+      "EXPIRED": "Expired",
+      "CANCELLED": "Cancelled"
+    },
+    "table": {
+      "user": "User",
+      "email": "Email",
+      "level": "Membership Level",
+      "status": "Status",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "actions": "Actions"
+    },
+    "search": {
+      "placeholder": "Search by user name or email..."
+    },
+    "filter": {
+      "all": "All",
+      "active": "Active",
+      "expired": "Expired",
+      "cancelled": "Cancelled"
+    },
+    "actions": {
+      "add": "Add Membership",
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancel": "Cancel Membership",
+      "cancelButton": "Cancel",
+      "create": "Create",
+      "update": "Update",
+      "saving": "Saving...",
+      "deleteConfirm": "Are you sure you want to delete this membership? This action cannot be undone.",
+      "cancelConfirm": "Are you sure you want to cancel this membership?"
+    },
+    "dialog": {
+      "addTitle": "Add Membership",
+      "addDescription": "Assign a membership to a user",
+      "editTitle": "Edit Membership",
+      "editDescription": "Update membership information"
+    },
+    "form": {
+      "user": "User",
+      "userPlaceholder": "Select a user",
+      "membershipLevel": "Membership Level",
+      "membershipLevelPlaceholder": "Select a membership level",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "status": "Status",
+      "statusPlaceholder": "Select status"
+    }
+  },
+  "Subscriptions": {
+    "title": "Subscription Activity",
+    "description": "View member subscription history and activity",
+    "loading": "Loading...",
+    "noData": "No subscription activity found",
+    "stats": {
+      "title": "Statistics",
+      "total": "Total Subscriptions",
+      "active": "Active",
+      "expired": "Expired",
+      "cancelled": "Cancelled",
+      "totalRevenue": "Total Revenue",
+      "monthlyRevenue": "Monthly Revenue"
+    },
+    "activity": {
+      "type": {
+        "CREATED": "Created",
+        "UPDATED": "Updated",
+        "CANCELLED": "Cancelled",
+        "EXPIRED": "Expired",
+        "RENEWED": "Renewed"
+      }
+    },
+    "table": {
+      "date": "Date",
+      "user": "User",
+      "activity": "Activity",
+      "membership": "Membership Level",
+      "status": "Status",
+      "price": "Price"
+    },
+    "search": {
+      "placeholder": "Search by user name or email..."
+    },
+    "filter": {
+      "all": "All Activity",
+      "created": "Created",
+      "renewed": "Renewed",
+      "cancelled": "Cancelled",
+      "expired": "Expired"
+    }
   }
 }

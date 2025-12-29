@@ -30,7 +30,10 @@ import {
   Layers,
   HelpCircle,
   FolderTree,
-  BookOpen
+  BookOpen,
+  Crown,
+  BadgeCheck,
+  UserCheck
 } from 'lucide-react';
 
 export function DashboardSidebar() {
@@ -124,6 +127,38 @@ export function DashboardSidebar() {
                   <Link href="/dashboard/faq">
                     <HelpCircle className="h-4 w-4" />
                     <span>{t('nav.faqManagement')}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        
+        <SidebarGroup>
+          <SidebarGroupLabel>{t('nav.membershipManagement')}</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/dashboard/membership'}>
+                  <Link href="/dashboard/membership">
+                    <LayoutDashboard className="h-4 w-4" />
+                    <span>{t('nav.membershipOverview')}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/dashboard/membership/levels'}>
+                  <Link href="/dashboard/membership/levels">
+                    <Crown className="h-4 w-4" />
+                    <span>{t('nav.membershipLevel')}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/dashboard/membership/subscriptions'}>
+                  <Link href="/dashboard/membership/subscriptions">
+                    <UserCheck className="h-4 w-4" />
+                    <span>{t('nav.memberSubscription')}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

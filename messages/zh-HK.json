@@ -26,6 +26,11 @@
       "usersManagement": "用戶管理",
       "servicesManagement": "服務管理",
       "faqManagement": "常見問題管理",
+      "membershipManagement": "會員管理",
+      "membershipOverview": "總覽",
+      "membershipLevel": "會籍級別",
+      "membership": "會籍",
+      "memberSubscription": "會員訂閱",
       "articleManagement": "文章管理",
       "categoryManagement": "分類管理",
       "articlesManagement": "文章管理"
@@ -51,8 +56,52 @@
       "title": "最近活動",
       "placeholder": "暫無最近活動可顯示。"
     }
-  },
-  "Auth": {
+  },  "MembershipLevels": {
+    "title": "會籍級別",
+    "description": "管理會籍級別和定價",
+    "loading": "載入中...",
+    "noData": "未找到會籍級別",
+    "table": {
+      "priority": "優先級",
+      "name": "名稱",
+      "slug": "代碼",
+      "price": "價格",
+      "duration": "期限",
+      "days": "天",
+      "actions": "操作"
+    },
+    "search": {
+      "placeholder": "按名稱或代碼搜尋..."
+    },
+    "actions": {
+      "add": "新增級別",
+      "edit": "編輯",
+      "delete": "刪除",
+      "cancel": "取消",
+      "create": "建立",
+      "update": "更新",
+      "saving": "儲存中...",
+      "deleteConfirm": "確定要刪除此會籍級別嗎？此操作無法復原。"
+    },
+    "dialog": {
+      "addTitle": "新增會籍級別",
+      "addDescription": "為會員建立新的會籍級別",
+      "editTitle": "編輯會籍級別",
+      "editDescription": "更新會籍級別資訊"
+    },
+    "form": {
+      "name": "名稱",
+      "namePlaceholder": "例如：高級會員",
+      "slug": "代碼",
+      "slugPlaceholder": "例如：premium",
+      "slugHint": "URL 友善標識符（小寫，無空格）",
+      "priority": "優先級",
+      "priorityHint": "數字越大，優先級越高",
+      "price": "價格",
+      "duration": "期限（天數）",
+      "durationHint": "會籍有效期（以天為單位）"
+    }
+  },  "Auth": {
     "signIn": {
       "title": "登入",
       "subtitle": "歡迎回來！請登入以繼續。",
@@ -651,5 +700,104 @@
     "postReview": "發表評論",
     "postReply": "發表回覆",
     "posting": "發表中..."
+  },
+  "Memberships": {
+    "title": "會員管理",
+    "description": "管理用戶會員資格和訂閱",
+    "loading": "載入中...",
+    "noData": "未找到會員資格",
+    "status": {
+      "ACTIVE": "有效",
+      "EXPIRED": "已到期",
+      "CANCELLED": "已取消"
+    },
+    "table": {
+      "user": "用戶",
+      "email": "電郵",
+      "level": "會員級別",
+      "status": "狀態",
+      "startDate": "開始日期",
+      "endDate": "結束日期",
+      "actions": "操作"
+    },
+    "search": {
+      "placeholder": "按用戶名稱或電郵搜尋..."
+    },
+    "filter": {
+      "all": "全部",
+      "active": "有效",
+      "expired": "已到期",
+      "cancelled": "已取消"
+    },
+    "actions": {
+      "add": "新增會員",
+      "edit": "編輯",
+      "delete": "刪除",
+      "cancel": "取消會員",
+      "cancelButton": "取消",
+      "create": "建立",
+      "update": "更新",
+      "saving": "儲存中...",
+      "deleteConfirm": "確定要刪除此會員資格嗎？此操作無法復原。",
+      "cancelConfirm": "確定要取消此會員資格嗎？"
+    },
+    "dialog": {
+      "addTitle": "新增會員",
+      "addDescription": "為用戶分配會員資格",
+      "editTitle": "編輯會員",
+      "editDescription": "更新會員資格資訊"
+    },
+    "form": {
+      "user": "用戶",
+      "userPlaceholder": "選擇用戶",
+      "membershipLevel": "會員級別",
+      "membershipLevelPlaceholder": "選擇會員級別",
+      "startDate": "開始日期",
+      "endDate": "結束日期",
+      "status": "狀態",
+      "statusPlaceholder": "選擇狀態"
+    }
+  },
+  "Subscriptions": {
+    "title": "訂閱活動",
+    "description": "查看會員訂閱歷史記錄和活動",
+    "loading": "載入中...",
+    "noData": "未找到訂閱活動",
+    "stats": {
+      "title": "統計",
+      "total": "總訂閱數",
+      "active": "有效",
+      "expired": "已到期",
+      "cancelled": "已取消",
+      "totalRevenue": "總收入",
+      "monthlyRevenue": "月收入"
+    },
+    "activity": {
+      "type": {
+        "CREATED": "已建立",
+        "UPDATED": "已更新",
+        "CANCELLED": "已取消",
+        "EXPIRED": "已到期",
+        "RENEWED": "已續訂"
+      }
+    },
+    "table": {
+      "date": "日期",
+      "user": "用戶",
+      "activity": "活動",
+      "membership": "會員級別",
+      "status": "狀態",
+      "price": "價格"
+    },
+    "search": {
+      "placeholder": "按用戶名稱或電郵搜尋..."
+    },
+    "filter": {
+      "all": "所有活動",
+      "created": "已建立",
+      "renewed": "已續訂",
+      "cancelled": "已取消",
+      "expired": "已到期"
+    }
   }
 }

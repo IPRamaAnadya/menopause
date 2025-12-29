@@ -30,8 +30,14 @@ export function useUserStats() {
         throw new Error('Failed to fetch user stats');
       }
 
-      const data: UserStats = await response.json();
-      setStats(data);
+      const result = await response.json();
+      
+      // Handle new API response structure with data wrapper
+      if (result.success && result.data) {
+        setStats(result.data);
+      } else {
+        throw new Error(result.error?.message || 'Failed to fetch user stats');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {

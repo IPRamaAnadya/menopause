@@ -143,6 +143,7 @@ model users {
   user_roles        user_roles[]
   articles          articles[]
   article_reviews   article_reviews[]
+  orders            orders[]
 }
 
 model services {
@@ -202,6 +203,35 @@ enum ArticleVisibility {
   PUBLIC
   MEMBER
   PRIORITY
+}
+
+enum OrderType {
+  SUBSCRIPTION
+  EVENT
+  PRODUCT
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum PaymentProvider {
+  STRIPE
+  MIDTRANS
+  XENDIT
+  ADMIN
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  CANCELLED
 }
 
 model categories {
@@ -298,4 +328,59 @@ model article_reviews {
   @@index([article_id])
   @@index([user_id])
   @@index([parent_id])
+}
+
+model orders {
+  id             Int          @id @default(autoincrement())
+  public_id      String       @unique @default(uuid()) @db.Uuid
+  user_id        Int
+  order_number   String       @unique
+  type           OrderType
+  status         OrderStatus  @default(PENDING)
+  gross_amount   Decimal      @db.Decimal(10, 2)
+  currency       String       @db.VarChar(3)
+  breakdown      Json
+  reference_id   Int?
+  reference_type String?      @db.VarChar(50)
+  metadata       Json?
+  notes          String?      @db.Text
+  expires_at     DateTime?
+  paid_at        DateTime?
+  created_at     DateTime     @default(now())
+  updated_at     DateTime     @updatedAt
+  users          users        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  payments       payments[]
+
+  @@index([user_id])
+  @@index([status])
+  @@index([type])
+  @@index([order_number])
+  @@index([reference_id, reference_type])
+  @@index([created_at])
+}
+
+model payments {
+  id                Int             @id @default(autoincrement())
+  public_id         String          @unique @default(uuid()) @db.Uuid
+  order_id          Int
+  provider          PaymentProvider
+  status            PaymentStatus   @default(PENDING)
+  amount            Decimal         @db.Decimal(10, 2)
+  currency          String          @db.VarChar(3)
+  fee_amount        Decimal?        @db.Decimal(10, 2)
+  net_amount        Decimal?        @db.Decimal(10, 2)
+  provider_ref      String?         @db.VarChar(255)
+  provider_payload  Json?
+  payment_method    String?         @db.VarChar(50)
+  failure_reason    String?         @db.Text
+  processed_at      DateTime?
+  created_at        DateTime        @default(now())
+  updated_at        DateTime        @updatedAt
+  orders            orders          @relation(fields: [order_id], references: [id], onDelete: Cascade)
+
+  @@index([order_id])
+  @@index([provider])
+  @@index([status])
+  @@index([provider_ref])
+  @@index([created_at])
 }

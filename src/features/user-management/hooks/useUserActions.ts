@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 export function useUserActions() {
   const [loading, setLoading] = useState(false);

@@ -1,0 +1,277 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Award, Calendar, CreditCard, CheckCircle2, ArrowUp, ArrowDown, Clock, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+interface MembershipLevel {
+  id: number;
+  name: string;
+  slug: string;
+  priority: number;
+  price: number;
+  duration_days: number;
+}
+
+interface CurrentMembership {
+  id: number;
+  user_id: number;
+  membership_level_id: number;
+  start_date: string;
+  end_date: string;
+  status: string;
+  membership_level: MembershipLevel;
+}
+
+export default function SubscriptionPage() {
+  const t = useTranslations("Member");
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState(false);
+  const [currentMembership, setCurrentMembership] = useState<CurrentMembership | null>(null);
+  const [availableLevels, setAvailableLevels] = useState<MembershipLevel[]>([]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const [membershipRes, levelsRes] = await Promise.all([
+        fetch('/api/member/memberships/current'),
+        fetch('/api/member/memberships/available'),
+      ]);
+
+      const membershipData = await membershipRes.json();
+      const levelsData = await levelsRes.json();
+
+      if (membershipData.success) {
+        setCurrentMembership(membershipData.data);
+      }
+
+      if (levelsData.success) {
+        setAvailableLevels(levelsData.data);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast({
+        title: t('error'),
+        description: t('subscription.fetchError'),
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCheckout = async (levelId: number, operationType: string) => {
+    setProcessing(true);
+    try {
+      const response = await fetch('/api/member/memberships/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          membership_level_id: levelId,
+          operation_type: operationType,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.data.url) {
+        // Redirect to Stripe checkout
+        window.location.href = data.data.url;
+      } else {
+        toast({
+          title: t('error'),
+          description: data.message || t('subscription.checkoutError'),
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Error creating checkout:', error);
+      toast({
+        title: t('error'),
+        description: t('subscription.checkoutError'),
+        variant: 'destructive',
+      });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const getOperationType = (level: MembershipLevel) => {
+    if (!currentMembership) return 'NEW';
+    if (level.id === currentMembership.membership_level_id) return 'EXTEND';
+    if (level.priority > currentMembership.membership_level.priority) return 'UPGRADE';
+    return 'DOWNGRADE';
+  };
+
+  const getOperationLabel = (level: MembershipLevel) => {
+    const type = getOperationType(level);
+    if (type === 'EXTEND') return t('subscription.extend');
+    if (type === 'UPGRADE') return t('subscription.upgrade');
+    if (type === 'DOWNGRADE') return t('subscription.downgrade');
+    return t('subscription.purchase');
+  };
+
+  const getOperationIcon = (level: MembershipLevel) => {
+    const type = getOperationType(level);
+    if (type === 'EXTEND') return <Clock className="h-4 w-4" />;
+    if (type === 'UPGRADE') return <ArrowUp className="h-4 w-4" />;
+    if (type === 'DOWNGRADE') return <ArrowDown className="h-4 w-4" />;
+    return null;
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">{t("subscription.title")}</h1>
+        <p className="text-muted-foreground">{t("subscription.description")}</p>
+      </div>
+
+      {/* Current Subscription */}
+      {currentMembership && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="h-5 w-5" />
+                  {currentMembership.membership_level.name}
+                </CardTitle>
+                <CardDescription>{t("subscription.planDescription")}</CardDescription>
+              </div>
+              <Badge variant="default" className="text-sm">
+                {currentMembership.status}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  <Calendar className="inline h-4 w-4 mr-2" />
+                  {t("subscription.startDate")}
+                </p>
+                <p className="text-lg font-semibold">
+                  {new Date(currentMembership.start_date).toLocaleDateString()}
+                </p>
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  <Calendar className="inline h-4 w-4 mr-2" />
+                  {t("subscription.endDate")}
+                </p>
+                <p className="text-lg font-semibold">
+                  {new Date(currentMembership.end_date).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+            <div className="pt-4 border-t">
+              <h4 className="font-semibold mb-3">{t("subscription.benefits")}</h4>
+              <ul className="space-y-2">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5" />
+                  <span>{t("subscription.benefit1")}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5" />
+                  <span>{t("subscription.benefit2")}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5" />
+                  <span>{t("subscription.benefit3")}</span>
+                </li>
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Available Plans */}
+      {availableLevels.length > 0 && (
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-2xl font-bold">{t("subscription.availablePlans")}</h2>
+            <p className="text-muted-foreground">{t("subscription.availablePlansDescription")}</p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {availableLevels.map((level) => {
+              const operationType = getOperationType(level);
+              const isCurrent = currentMembership?.membership_level_id === level.id;
+
+              return (
+                <Card key={level.id} className={isCurrent ? 'border-primary' : ''}>
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <CardTitle>{level.name}</CardTitle>
+                      {isCurrent && (
+                        <Badge variant="outline" className="ml-2">
+                          {t('subscription.current')}
+                        </Badge>
+                      )}
+                    </div>
+                    <CardDescription>
+                      {level.duration_days} {t('subscription.days')}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="text-3xl font-bold">
+                      HK${level.price.toFixed(2)}
+                    </div>
+                    <Button
+                      onClick={() => handleCheckout(level.id, operationType)}
+                      disabled={processing}
+                      className="w-full"
+                      variant={isCurrent ? 'outline' : 'default'}
+                    >
+                      {processing ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : (
+                        getOperationIcon(level)
+                      )}
+                      {processing ? t('subscription.processing') : getOperationLabel(level)}
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Payment History */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="h-5 w-5" />
+            {t("subscription.paymentHistory")}
+          </CardTitle>
+          <CardDescription>{t("subscription.paymentDescription")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8 text-muted-foreground">
+            {t("subscription.noPayments")}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+

@@ -112,3 +112,15 @@ export const ApiErrors = {
     return response;
   },
 };
+
+/**
+ * Simple API response helpers
+ */
+export const apiResponse = {
+  success: <T>(data: T) => ({ success: true, data }),
+  error: (message: string, details?: any) => ({
+    success: false,
+    message,
+    ...(details && { details }),
+  }),
+};

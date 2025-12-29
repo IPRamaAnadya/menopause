@@ -99,53 +99,7 @@ export class MembershipService {
     };
   }
 
-  /**
-   * Get user's active membership
-   */
-  static async getUserActiveMembership(userId: number) {
-    const membership = await prisma.memberships.findFirst({
-      where: {
-        user_id: userId,
-        status: 'ACTIVE',
-      },
-      include: {
-        users: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        membership_levels: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            price: true,
-            duration_days: true,
-          },
-        },
-      },
-    });
 
-    if (!membership) return null;
-
-    return {
-      id: membership.id,
-      user_id: membership.user_id,
-      membership_level_id: membership.membership_level_id,
-      start_date: membership.start_date,
-      end_date: membership.end_date,
-      status: membership.status,
-      created_at: membership.created_at,
-      updated_at: membership.updated_at,
-      user: membership.users,
-      membership_level: {
-        ...membership.membership_levels,
-        price: parseFloat(membership.membership_levels.price.toString()),
-      },
-    };
-  }
 
   /**
    * Get membership by ID
@@ -445,6 +399,193 @@ export class MembershipService {
       membership_level: {
         ...membership.membership_levels,
         price: parseFloat(membership.membership_levels.price.toString()),
+      },
+    };
+  }
+
+  /**
+   * Get user's current active membership
+   */
+  static async getUserActiveMembership(userId: number) {
+    const membership = await prisma.memberships.findFirst({
+      where: {
+        user_id: userId,
+        status: 'ACTIVE',
+      },
+      include: {
+        membership_levels: true,
+      },
+      orderBy: {
+        end_date: 'desc',
+      },
+    });
+
+    if (!membership) {
+      return null;
+    }
+
+    return {
+      id: membership.id,
+      user_id: membership.user_id,
+      membership_level_id: membership.membership_level_id,
+      start_date: membership.start_date,
+      end_date: membership.end_date,
+      status: membership.status,
+      created_at: membership.created_at,
+      updated_at: membership.updated_at,
+      membership_level: {
+        id: membership.membership_levels.id,
+        name: membership.membership_levels.name,
+        slug: membership.membership_levels.slug,
+        priority: membership.membership_levels.priority,
+        duration_days: membership.membership_levels.duration_days,
+        price: parseFloat(membership.membership_levels.price.toString()),
+      },
+    };
+  }
+
+  /**
+   * Get all available membership levels
+   */
+  static async getAvailableMembershipLevels() {
+    const levels = await prisma.membership_levels.findMany({
+      orderBy: {
+        priority: 'asc',
+      },
+    });
+
+    return levels.map(level => ({
+      id: level.id,
+      name: level.name,
+      slug: level.slug,
+      priority: level.priority,
+      price: parseFloat(level.price.toString()),
+      duration_days: level.duration_days,
+      created_at: level.created_at,
+      updated_at: level.updated_at,
+    }));
+  }
+
+  /**
+   * Extend current membership - adds duration to existing end date
+   */
+  static async extendMembership(userId: number, membershipLevelId: number) {
+    const currentMembership = await this.getUserActiveMembership(userId);
+    
+    if (!currentMembership) {
+      throw new Error('No active membership found to extend');
+    }
+
+    // Get the membership level to extend with
+    const level = await prisma.membership_levels.findUnique({
+      where: { id: membershipLevelId },
+    });
+
+    if (!level) {
+      throw new Error('Membership level not found');
+    }
+
+    // Calculate new end date by adding duration to current end date
+    const currentEndDate = new Date(currentMembership.end_date);
+    const newEndDate = new Date(currentEndDate);
+    newEndDate.setDate(newEndDate.getDate() + level.duration_days);
+
+    // Update existing membership
+    const updatedMembership = await prisma.memberships.update({
+      where: { id: currentMembership.id },
+      data: {
+        end_date: newEndDate,
+        updated_at: new Date(),
+      },
+      include: {
+        membership_levels: true,
+      },
+    });
+
+    return {
+      id: updatedMembership.id,
+      user_id: updatedMembership.user_id,
+      membership_level_id: updatedMembership.membership_level_id,
+      start_date: updatedMembership.start_date,
+      end_date: updatedMembership.end_date,
+      status: updatedMembership.status,
+      created_at: updatedMembership.created_at,
+      updated_at: updatedMembership.updated_at,
+      membership_level: {
+        ...updatedMembership.membership_levels,
+        price: parseFloat(updatedMembership.membership_levels.price.toString()),
+      },
+    };
+  }
+
+  /**
+   * Change membership level (upgrade or downgrade)
+   * Duration follows the new level's duration from today
+   */
+  static async changeMembershipLevel(
+    userId: number,
+    newMembershipLevelId: number,
+    type: 'UPGRADE' | 'DOWNGRADE'
+  ) {
+    const currentMembership = await this.getUserActiveMembership(userId);
+    
+    if (!currentMembership) {
+      throw new Error('No active membership found to change');
+    }
+
+    if (currentMembership.membership_level_id === newMembershipLevelId) {
+      throw new Error('Cannot change to the same membership level');
+    }
+
+    // Get the new membership level
+    const newLevel = await prisma.membership_levels.findUnique({
+      where: { id: newMembershipLevelId },
+    });
+
+    if (!newLevel) {
+      throw new Error('Membership level not found');
+    }
+
+    // Validate upgrade/downgrade based on priority
+    if (type === 'UPGRADE' && newLevel.priority <= currentMembership.membership_level.priority) {
+      throw new Error('New level must be higher priority for upgrade');
+    }
+
+    if (type === 'DOWNGRADE' && newLevel.priority >= currentMembership.membership_level.priority) {
+      throw new Error('New level must be lower priority for downgrade');
+    }
+
+    // Calculate new dates - duration follows new level from today
+    const startDate = new Date();
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + newLevel.duration_days);
+
+    // Update membership with new level and dates
+    const updatedMembership = await prisma.memberships.update({
+      where: { id: currentMembership.id },
+      data: {
+        membership_level_id: newMembershipLevelId,
+        start_date: startDate,
+        end_date: endDate,
+        updated_at: new Date(),
+      },
+      include: {
+        membership_levels: true,
+      },
+    });
+
+    return {
+      id: updatedMembership.id,
+      user_id: updatedMembership.user_id,
+      membership_level_id: updatedMembership.membership_level_id,
+      start_date: updatedMembership.start_date,
+      end_date: updatedMembership.end_date,
+      status: updatedMembership.status,
+      created_at: updatedMembership.created_at,
+      updated_at: updatedMembership.updated_at,
+      membership_level: {
+        ...updatedMembership.membership_levels,
+        price: parseFloat(updatedMembership.membership_levels.price.toString()),
       },
     };
   }

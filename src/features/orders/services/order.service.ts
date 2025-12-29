@@ -155,13 +155,161 @@ export class OrderService {
     const { event, data } = await paymentProvider.processWebhook(payload, signature);
 
     // Handle based on event type
-    if (event.includes('payment_intent.succeeded') || event.includes('charge.succeeded')) {
+    console.log(`Processing webhook event: ${event}`);
+
+    
+    if (event.includes('checkout.session.completed')) {
+      return this.handleCheckoutSessionCompleted(data);
+    } else if (event.includes('payment_intent.succeeded') || event.includes('charge.succeeded')) {
       return this.handlePaymentSuccess(data);
     } else if (event.includes('payment_intent.payment_failed') || event.includes('charge.failed')) {
       return this.handlePaymentFailure(data);
     }
 
+    console.log(`Webhook event ${event} not handled - no action required`);
     return { processed: true, event };
+  }
+
+  /**
+   * Handle checkout session completed (for Checkout flow)
+   */
+  private async handleCheckoutSessionCompleted(data: any) {
+    console.log('Handling checkout.session.completed event', { 
+      sessionId: data.id,
+      metadata: data.metadata 
+    });
+    
+    // Try to find payment by public_id from metadata first
+    const metadata = data.metadata || {};
+    const paymentPublicId = metadata.payment_public_id;
+    
+    let payment;
+    
+    if (paymentPublicId) {
+      console.log(`Looking for payment with publicId: ${paymentPublicId}`);
+      payment = await paymentRepository.findByPublicId(paymentPublicId);
+      
+      if (payment) {
+        console.log(`Found payment ${payment.id} by publicId`);
+      }
+    }
+    
+    // Fallback to payment intent if not found by publicId
+    if (!payment) {
+      const paymentIntentId = data.payment_intent;
+      if (!paymentIntentId) {
+        console.log('No payment intent in checkout session');
+        return { success: true, message: 'No payment intent found' };
+      }
+
+      console.log(`Looking for payment with providerRef: ${paymentIntentId}`);
+      payment = await paymentRepository.findByProviderRef(paymentIntentId);
+      
+      if (!payment) {
+        console.log('Payment not found with providerRef:', paymentIntentId);
+        return { success: true, message: 'Payment not tracked in system' };
+      }
+    }
+
+    console.log(`Found payment ${payment.id}, updating status`);
+    
+    // Get payment intent ID from checkout session
+    const paymentIntentId = data.payment_intent;
+    
+    // Get payment details from provider if we have payment intent
+    let feeAmount: number | undefined = undefined;
+    let netAmount: number | undefined = undefined;
+    
+    if (paymentIntentId) {
+      const provider = paymentProviderFactory.getProvider(payment.provider);
+      try {
+        const paymentDetails = await provider.getPaymentDetails(paymentIntentId);
+        feeAmount = paymentDetails.feeAmount;
+        netAmount = paymentDetails.netAmount;
+      } catch (error) {
+        console.error('Error getting payment details:', error);
+        // Continue without fee details
+      }
+    }
+
+    // Update payment status
+    await paymentRepository.updateStatus(payment.id, {
+      status: PaymentStatus.SUCCEEDED,
+      feeAmount,
+      netAmount,
+      providerPayload: data,
+      processedAt: new Date(),
+    });
+
+    // Update order status
+    await orderRepository.updateStatus(
+      payment.order_id,
+      OrderStatus.PAID,
+      new Date()
+    );
+
+    // Get order details to check if this is a membership order
+    const order = await orderRepository.findById(payment.order_id);
+    if (order && order.metadata) {
+      const metadata = order.metadata as any;
+      
+      // Process membership changes
+      if (metadata.membership_level_id && metadata.operation_type) {
+        console.log('Processing membership change:', metadata);
+        await this.processMembershipChange(
+          order.userId,
+          parseInt(metadata.membership_level_id),
+          metadata.operation_type
+        );
+      }
+    }
+    
+    return { success: true, orderId: payment.order_id };
+  }
+
+  /**
+   * Process membership change after successful payment
+   */
+  private async processMembershipChange(
+    userId: number,
+    membershipLevelId: number,
+    operationType: string
+  ) {
+    const MembershipService = (await import('@/features/membership/services/membership.service')).MembershipService;
+
+    try {
+      if (operationType === 'EXTEND') {
+        await MembershipService.extendMembership(userId, membershipLevelId);
+        console.log(`Extended membership for user ${userId}`);
+      } else if (operationType === 'UPGRADE') {
+        await MembershipService.changeMembershipLevel(userId, membershipLevelId, 'UPGRADE');
+        console.log(`Upgraded membership for user ${userId}`);
+      } else if (operationType === 'DOWNGRADE') {
+        await MembershipService.changeMembershipLevel(userId, membershipLevelId, 'DOWNGRADE');
+        console.log(`Downgraded membership for user ${userId}`);
+      } else if (operationType === 'NEW') {
+        // For new membership, calculate dates
+        const levels = await MembershipService.getAvailableMembershipLevels();
+        const level = levels.find(l => l.id === membershipLevelId);
+        
+        if (level) {
+          const startDate = new Date();
+          const endDate = new Date(startDate);
+          endDate.setDate(endDate.getDate() + level.duration_days);
+
+          await MembershipService.createMembership({
+            user_id: userId,
+            membership_level_id: membershipLevelId,
+            start_date: startDate,
+            end_date: endDate,
+          });
+          console.log(`Created new membership for user ${userId}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error processing membership change:', error);
+      // Don't throw - we already marked payment as succeeded
+    }
   }
 
   /**
@@ -171,7 +319,10 @@ export class OrderService {
     const payment = await paymentRepository.findByProviderRef(data.id);
     
     if (!payment) {
-      throw new Error('Payment not found');
+      // Payment not found - this can happen with Checkout Sessions
+      // where the payment intent is created by Stripe
+      console.log(`Payment with providerRef ${data.id} not found - likely a checkout session`);
+      return { success: true, message: 'Payment not tracked in system' };
     }
 
     // Get payment details from provider

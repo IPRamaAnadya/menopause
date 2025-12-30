@@ -15,11 +15,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const activities = await SubscriptionService.getUserSubscriptionActivity(
-      parseInt(session.user.id)
+    const { searchParams } = new URL(request.url);
+    const page = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1;
+    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 10;
+
+    const result = await SubscriptionService.getUserSubscriptionActivity(
+      parseInt(session.user.id),
+      { page, limit }
     );
 
-    return NextResponse.json(apiResponse.success(activities));
+    return NextResponse.json(apiResponse.success(result));
   } catch (error: any) {
     console.error('Error fetching subscription activity:', error);
     return NextResponse.json(

@@ -60,6 +60,9 @@ model membership_levels {
   updated_at    DateTime      @updatedAt
   slug          String        @unique
   memberships   memberships[]
+
+  event_prices  event_prices[]
+  event_registrations event_registrations[]
 }
 
 model memberships {
@@ -144,6 +147,10 @@ model users {
   articles          articles[]
   article_reviews   article_reviews[]
   orders            orders[]
+
+  events_created  events[]       
+  event_registrations event_registrations[]
+
 }
 
 model services {
@@ -213,6 +220,7 @@ enum OrderType {
   MEMBERSHIP_PURCHASE
   MEMBERSHIP_RENEWAL
   MEMBERSHIP_UPGRADE
+  MEMBERSHIP_DOWNGRADE
 }
 
 enum OrderStatus {
@@ -387,4 +395,137 @@ model payments {
   @@index([status])
   @@index([provider_ref])
   @@index([created_at])
+}
+
+/////////////////////////////
+// EVENT MODELS (FINAL)
+/////////////////////////////
+
+model events {
+  id             Int            @id @default(autoincrement())
+  public_id      String         @unique @default(uuid()) @db.Uuid
+  slug           String         @unique @db.VarChar(255)
+
+  start_date     DateTime
+  end_date       DateTime
+  start_time     DateTime?
+  end_time       DateTime?
+
+  is_online      Boolean        @default(false)
+  meeting_url    String?
+
+  is_paid        Boolean        @default(false)
+
+  capacity       Int?
+  is_public      Boolean        @default(true)
+  status         EventStatus    @default(DRAFT)
+  created_by     Int
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @updatedAt
+
+  creator        users          @relation(fields: [created_by], references: [id])
+  translations   event_translations[]
+  prices         event_prices[]
+  registrations  event_registrations[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([start_date])
+  @@index([is_public])
+  @@index([is_paid])
+}
+
+model event_translations {
+  id                 Int      @id @default(autoincrement())
+  event_id           Int
+  locale             String   @db.VarChar(10)
+
+  title              String   @db.VarChar(255)
+  short_description  String?
+  description        String   @db.Text
+
+  // OFFLINE EVENT LOCATION (MULTI LANGUAGE)
+  place_name         String?  @db.VarChar(255)
+  place_detail       String?  @db.Text
+
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  events             events   @relation(fields: [event_id], references: [id], onDelete: Cascade)
+
+  @@unique([event_id, locale])
+  @@index([locale])
+}
+
+model event_prices {
+  id                    Int      @id @default(autoincrement())
+  event_id              Int
+
+  // NULL = PUBLIC
+  membership_level_id   Int?
+
+  price                 Decimal  @db.Decimal(10, 2)
+  quota                 Int?
+  is_active             Boolean  @default(true)
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+
+  events                events              @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  membership_levels     membership_levels?  @relation(fields: [membership_level_id], references: [id])
+
+  @@unique([event_id, membership_level_id])
+  @@index([event_id])
+}
+
+model event_registrations {
+  id                    Int      @id @default(autoincrement())
+  public_id             String   @unique @default(uuid()) @db.Uuid
+  event_id              Int
+  user_id               Int?     // null = guest
+
+  // NULL = PUBLIC
+  membership_level_id   Int?
+
+  price                 Decimal  @db.Decimal(10, 2)
+  status                EventRegistrationStatus @default(PENDING)
+  registered_at         DateTime @default(now())
+
+  events                events              @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  users                 users?              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  membership_levels     membership_levels?  @relation(fields: [membership_level_id], references: [id])
+
+  guests                event_guests?
+
+  @@index([event_id])
+  @@index([user_id])
+  @@index([status])
+}
+
+model event_guests {
+  id               Int      @id @default(autoincrement())
+  registration_id  Int      @unique
+  full_name        String
+  email            String
+  phone            String?
+  created_at       DateTime @default(now())
+
+  registration     event_registrations @relation(fields: [registration_id], references: [id], onDelete: Cascade)
+}
+
+/////////////////////////////
+// EVENT ENUMS
+/////////////////////////////
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+  ENDED
+}
+
+enum EventRegistrationStatus {
+  PENDING
+  PAID
+  CANCELLED
+  ATTENDED
 }

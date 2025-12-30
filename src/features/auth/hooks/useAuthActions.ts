@@ -101,8 +101,9 @@ export function useAuthActions() {
       const result = await response.json();
 
       if (!response.ok) {
-        toast.error(result.error || 'Registration failed');
-        throw new Error(result.error || 'Registration failed');
+        const errorMessage = result.error?.message || result.message || 'Registration failed';
+        toast.error(errorMessage);
+        throw new Error(errorMessage);
       }
 
       toast.success('Account created successfully!');

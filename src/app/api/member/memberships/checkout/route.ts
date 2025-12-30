@@ -5,7 +5,7 @@ import { stripe, formatAmountForStripe } from '@/lib/stripe';
 import { apiResponse } from '@/lib/api-response';
 import { MembershipService } from '@/features/membership/services/membership.service';
 import { orderService } from '@/features/orders/services/order.service';
-import { OrderType, PaymentProvider } from '@/generated/prisma';
+import { OrderType, PaymentProvider, OrderStatus, PaymentStatus } from '@/generated/prisma';
 
 export async function POST(request: NextRequest) {
   try {
@@ -81,14 +81,71 @@ export async function POST(request: NextRequest) {
       orderType = OrderType.MEMBERSHIP_PURCHASE;
     } else if (operation_type === 'EXTEND') {
       orderType = OrderType.MEMBERSHIP_RENEWAL;
-    } else {
+    } else if (operation_type === 'UPGRADE') {
       orderType = OrderType.MEMBERSHIP_UPGRADE;
+    } else {
+      orderType = OrderType.MEMBERSHIP_DOWNGRADE;
     }
 
     // Get base URL from request or environment
     const protocol = request.headers.get('x-forwarded-proto') || 'http';
     const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'localhost:3000';
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
+
+    // Check if price is 0 (free membership)
+    if (level.price === 0) {
+      console.log('[Checkout] Free membership detected, processing without payment gateway');
+      
+      // Create order and payment with PAID status immediately
+      const orderResult = await orderService.createOrder({
+        userId: parseInt(session.user.id),
+        type: orderType,
+        grossAmount: 0,
+        currency: 'HKD',
+        breakdown: {
+          base: 0,
+          tax: 0,
+          discount: 0,
+        },
+        metadata: {
+          membership_level_id: membership_level_id.toString(),
+          operation_type,
+        },
+        paymentProvider: PaymentProvider.ADMIN, // Free membership uses ADMIN provider
+      });
+
+      // Import repositories to update order and payment status
+      const { orderRepository } = await import('@/features/orders/repositories/order.repository');
+      const { paymentRepository } = await import('@/features/orders/repositories/payment.repository');
+
+      // Mark order as PAID immediately
+      await orderRepository.updateStatus(orderResult.order.id, OrderStatus.PAID, new Date());
+
+      // Mark payment as succeeded
+      await paymentRepository.updateStatus(orderResult.payment.id, {
+        status: PaymentStatus.SUCCEEDED,
+        processedAt: new Date(),
+      });
+
+      console.log('[Checkout] Order marked as PAID, processing membership change');
+
+      // Process membership change directly
+      const { OrderService } = await import('@/features/orders/services/order.service');
+      await OrderService.processMembershipChangePublic(
+        parseInt(session.user.id),
+        parseInt(membership_level_id),
+        operation_type
+      );
+
+      // Return success response without Stripe URL
+      return NextResponse.json(
+        apiResponse.success({
+          orderId: orderResult.order.id,
+          free: true,
+          redirectUrl: `${baseUrl}/member/subscription/payment/success?free=true`,
+        })
+      );
+    }
 
     // Create order and payment record BEFORE creating checkout session
     // This allows the webhook to find and update the payment when it succeeds

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Pagination } from "@/components/ui/pagination";
 import { Award, Calendar, CreditCard, CheckCircle2, ArrowUp, ArrowDown, Clock, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -55,6 +56,13 @@ export default function SubscriptionPage() {
   const [currentMembership, setCurrentMembership] = useState<CurrentMembership | null>(null);
   const [availableLevels, setAvailableLevels] = useState<MembershipLevel[]>([]);
   const [activities, setActivities] = useState<SubscriptionActivity[]>([]);
+  const [activityPage, setActivityPage] = useState(1);
+  const [activityPagination, setActivityPagination] = useState({
+    total: 0,
+    page: 1,
+    limit: 5,
+    totalPages: 0,
+  });
 
   useEffect(() => {
     fetchData();
@@ -62,15 +70,13 @@ export default function SubscriptionPage() {
 
   const fetchData = async () => {
     try {
-      const [membershipRes, levelsRes, activityRes] = await Promise.all([
+      const [membershipRes, levelsRes] = await Promise.all([
         fetch('/api/member/memberships/current'),
         fetch('/api/member/memberships/available'),
-        fetch('/api/member/subscription/activity'),
       ]);
 
       const membershipData = await membershipRes.json();
       const levelsData = await levelsRes.json();
-      const activityData = await activityRes.json();
 
       if (membershipData.success) {
         setCurrentMembership(membershipData.data);
@@ -80,9 +86,7 @@ export default function SubscriptionPage() {
         setAvailableLevels(levelsData.data);
       }
 
-      if (activityData.success) {
-        setActivities(activityData.data);
-      }
+      await fetchActivities();
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({
@@ -94,6 +98,35 @@ export default function SubscriptionPage() {
       setLoading(false);
     }
   };
+
+  const fetchActivities = async () => {
+    try {
+      const params = new URLSearchParams();
+      params.append('page', activityPage.toString());
+      params.append('limit', '5');
+
+      const activityRes = await fetch(`/api/member/subscription/activity?${params.toString()}`);
+      const activityData = await activityRes.json();
+
+      if (activityData.success) {
+        if (activityData.data.data) {
+          setActivities(activityData.data.data);
+          setActivityPagination(activityData.data.pagination);
+        } else {
+          // Old response format (array)
+          setActivities(activityData.data);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching activities:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (!loading) {
+      fetchActivities();
+    }
+  }, [activityPage]);
 
   const handleCheckout = async (levelId: number, operationType: string) => {
     setProcessing(true);
@@ -111,9 +144,24 @@ export default function SubscriptionPage() {
 
       const data = await response.json();
 
-      if (data.success && data.data.url) {
-        // Redirect to Stripe checkout
-        window.location.href = data.data.url;
+      if (data.success) {
+        if (data.data.free && data.data.redirectUrl) {
+          // Free membership, redirect to success page
+          toast({
+            title: t('success'),
+            description: t('subscription.freeSuccess'),
+          });
+          window.location.href = data.data.redirectUrl;
+        } else if (data.data.url) {
+          // Paid membership, redirect to Stripe checkout
+          window.location.href = data.data.url;
+        } else {
+          toast({
+            title: t('error'),
+            description: data.message || t('subscription.checkoutError'),
+            variant: 'destructive',
+          });
+        }
       } else {
         toast({
           title: t('error'),
@@ -353,6 +401,17 @@ export default function SubscriptionPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+          {activityPagination.totalPages > 1 && (
+            <div className="mt-4 pt-4 border-t">
+              <Pagination
+                currentPage={activityPage}
+                totalPages={activityPagination.totalPages}
+                onPageChange={setActivityPage}
+                totalItems={activityPagination.total}
+                itemsPerPage={activityPagination.limit}
+              />
             </div>
           )}
         </CardContent>

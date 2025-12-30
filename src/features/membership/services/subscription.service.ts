@@ -15,14 +15,14 @@ export class SubscriptionService {
       prisma.orders.count({
         where: {
           type: {
-            in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE'],
+            in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE', 'MEMBERSHIP_DOWNGRADE'],
           },
         },
       }),
       prisma.orders.count({
         where: {
           type: {
-            in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE'],
+            in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE', 'MEMBERSHIP_DOWNGRADE'],
           },
           status: 'PAID',
         },
@@ -30,7 +30,7 @@ export class SubscriptionService {
       prisma.orders.count({
         where: {
           type: {
-            in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE'],
+            in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE', 'MEMBERSHIP_DOWNGRADE'],
           },
           status: 'FAILED',
         },
@@ -38,7 +38,7 @@ export class SubscriptionService {
       prisma.orders.count({
         where: {
           type: {
-            in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE'],
+            in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE', 'MEMBERSHIP_DOWNGRADE'],
           },
           status: 'CANCELLED',
         },
@@ -49,7 +49,7 @@ export class SubscriptionService {
     const allOrders = await prisma.orders.findMany({
       where: {
         type: {
-          in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE'],
+          in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE', 'MEMBERSHIP_DOWNGRADE'],
         },
         status: 'PAID',
       },
@@ -70,7 +70,7 @@ export class SubscriptionService {
     const monthlyOrders = await prisma.orders.findMany({
       where: {
         type: {
-          in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE'],
+          in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE', 'MEMBERSHIP_DOWNGRADE'],
         },
         status: 'PAID',
         created_at: {
@@ -111,7 +111,7 @@ export class SubscriptionService {
 
     const where: any = {
       type: {
-        in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE'],
+        in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE', 'MEMBERSHIP_DOWNGRADE'],
       },
     };
 
@@ -125,6 +125,8 @@ export class SubscriptionService {
         where.type = 'MEMBERSHIP_RENEWAL';
       } else if (statusUpper === 'UPGRADED') {
         where.type = 'MEMBERSHIP_UPGRADE';
+      } else if (statusUpper === 'DOWNGRADED') {
+        where.type = 'MEMBERSHIP_DOWNGRADE';
       } else if (statusUpper === 'CANCELLED') {
         where.status = 'CANCELLED';
       } else if (statusUpper === 'EXPIRED') {
@@ -194,7 +196,7 @@ export class SubscriptionService {
     const activities = await Promise.all(
       orders.map(async (order) => {
         // Map order type to activity type
-        let activityType: 'CREATED' | 'UPDATED' | 'CANCELLED' | 'EXPIRED' | 'RENEWED' = 'CREATED';
+        let activityType: 'CREATED' | 'UPDATED' | 'CANCELLED' | 'EXPIRED' | 'RENEWED' | 'DOWNGRADED' = 'CREATED';
         let description = '';
 
         if (order.type === 'MEMBERSHIP_PURCHASE') {
@@ -206,6 +208,9 @@ export class SubscriptionService {
         } else if (order.type === 'MEMBERSHIP_UPGRADE') {
           activityType = 'UPDATED';
           description = `Membership upgraded for ${order.users.name}`;
+        } else if (order.type === 'MEMBERSHIP_DOWNGRADE') {
+          activityType = 'DOWNGRADED';
+          description = `Membership downgraded for ${order.users.name}`;
         }
 
         if (order.status === 'CANCELLED') {
@@ -290,19 +295,27 @@ export class SubscriptionService {
   /**
    * Get subscription activity for a specific user
    */
-  static async getUserSubscriptionActivity(userId: number) {
+  static async getUserSubscriptionActivity(userId: number, options?: {
+    page?: number;
+    limit?: number;
+  }) {
+    const page = options?.page || 1;
+    const limit = options?.limit || 10;
+    const skip = (page - 1) * limit;
+
     // Get all orders with payments for this user that are membership-related
-    const orders = await prisma.orders.findMany({
-      where: {
-        user_id: userId,
-        type: {
-          in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE'],
+    const [orders, total] = await Promise.all([
+      prisma.orders.findMany({
+        where: {
+          user_id: userId,
+          type: {
+            in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE', 'MEMBERSHIP_DOWNGRADE'],
+          },
         },
-      },
-      include: {
-        payments: {
-          select: {
-            id: true,
+        include: {
+          payments: {
+            select: {
+              id: true,
             amount: true,
             status: true,
           },
@@ -311,7 +324,18 @@ export class SubscriptionService {
       orderBy: {
         created_at: 'desc',
       },
-    });
+      skip,
+      take: limit,
+    }),
+      prisma.orders.count({
+        where: {
+          user_id: userId,
+          type: {
+            in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE', 'MEMBERSHIP_DOWNGRADE'],
+          },
+        },
+      }),
+    ]);
 
     // Map orders to activities
     const activities = await Promise.all(
@@ -322,6 +346,8 @@ export class SubscriptionService {
           activityType = 'EXTEND';
         } else if (order.type === 'MEMBERSHIP_UPGRADE') {
           activityType = 'UPGRADE';
+        } else if (order.type === 'MEMBERSHIP_DOWNGRADE') {
+          activityType = 'DOWNGRADE';
         } else if (order.type === 'MEMBERSHIP_PURCHASE') {
           activityType = 'NEW';
         }
@@ -392,6 +418,14 @@ export class SubscriptionService {
       })
     );
 
-    return activities;
+    return {
+      data: activities,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 }

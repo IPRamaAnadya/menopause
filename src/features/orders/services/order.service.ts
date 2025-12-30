@@ -365,6 +365,18 @@ export class OrderService {
   }
 
   /**
+   * Public static method to process membership change (for free memberships)
+   */
+  static async processMembershipChangePublic(
+    userId: number,
+    membershipLevelId: number,
+    operationType: string
+  ) {
+    const instance = new OrderService();
+    await instance.processMembershipChange(userId, membershipLevelId, operationType);
+  }
+
+  /**
    * Handle successful payment
    */
   private async handlePaymentSuccess(data: any) {

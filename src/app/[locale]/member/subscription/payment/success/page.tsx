@@ -17,6 +17,26 @@ export default function PaymentSuccessPage() {
 
   useEffect(() => {
     const sessionId = searchParams.get('session_id');
+    const isFree = searchParams.get('free') === 'true';
+
+    // Handle free membership (no payment required)
+    if (isFree) {
+      setVerifying(false);
+      // Fetch the user's current membership
+      fetch('/api/member/memberships/me')
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.data) {
+            setMembership(data.data);
+          }
+        })
+        .catch(err => {
+          console.error('Error fetching membership:', err);
+        });
+      return;
+    }
+
+    // Handle paid membership verification
     if (!sessionId) {
       setError('Invalid payment session');
       setVerifying(false);

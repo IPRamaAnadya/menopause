@@ -18,19 +18,21 @@ export class SubscriptionService {
       prisma.memberships.count({ where: { status: 'CANCELLED' } }),
     ]);
 
-    // Calculate total revenue from all memberships
-    const memberships = await prisma.memberships.findMany({
-      include: {
-        membership_levels: {
-          select: {
-            price: true,
-          },
+    // Calculate total revenue from all membership orders
+    const allOrders = await prisma.orders.findMany({
+      where: {
+        type: {
+          in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE'],
         },
+        status: 'PAID',
+      },
+      select: {
+        gross_amount: true,
       },
     });
 
-    const totalRevenue = memberships.reduce((sum, m) => {
-      return sum + parseFloat(m.membership_levels.price.toString());
+    const totalRevenue = allOrders.reduce((sum, order) => {
+      return sum + parseFloat(order.gross_amount.toString());
     }, 0);
 
     // Calculate monthly revenue (current month)
@@ -38,23 +40,23 @@ export class SubscriptionService {
     startOfMonth.setDate(1);
     startOfMonth.setHours(0, 0, 0, 0);
 
-    const monthlyMemberships = await prisma.memberships.findMany({
+    const monthlyOrders = await prisma.orders.findMany({
       where: {
+        type: {
+          in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE'],
+        },
+        status: 'PAID',
         created_at: {
           gte: startOfMonth,
         },
       },
-      include: {
-        membership_levels: {
-          select: {
-            price: true,
-          },
-        },
+      select: {
+        gross_amount: true,
       },
     });
 
-    const monthlyRevenue = monthlyMemberships.reduce((sum, m) => {
-      return sum + parseFloat(m.membership_levels.price.toString());
+    const monthlyRevenue = monthlyOrders.reduce((sum, order) => {
+      return sum + parseFloat(order.gross_amount.toString());
     }, 0);
 
     return {

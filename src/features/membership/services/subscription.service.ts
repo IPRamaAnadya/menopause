@@ -12,10 +12,37 @@ export class SubscriptionService {
       expired,
       cancelled,
     ] = await Promise.all([
-      prisma.memberships.count(),
-      prisma.memberships.count({ where: { status: 'ACTIVE' } }),
-      prisma.memberships.count({ where: { status: 'EXPIRED' } }),
-      prisma.memberships.count({ where: { status: 'CANCELLED' } }),
+      prisma.orders.count({
+        where: {
+          type: {
+            in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE'],
+          },
+        },
+      }),
+      prisma.orders.count({
+        where: {
+          type: {
+            in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE'],
+          },
+          status: 'PAID',
+        },
+      }),
+      prisma.orders.count({
+        where: {
+          type: {
+            in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE'],
+          },
+          status: 'FAILED',
+        },
+      }),
+      prisma.orders.count({
+        where: {
+          type: {
+            in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE'],
+          },
+          status: 'CANCELLED',
+        },
+      }),
     ]);
 
     // Calculate total revenue from all membership orders

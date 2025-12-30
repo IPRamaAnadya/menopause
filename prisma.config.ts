@@ -7,8 +7,9 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
+    seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    url: process.env.DATABASE_URL || "postgresql://iputuramaanadya@localhost:5432/menopause",
+    url: process.env.DATABASE_URL,
   },
 });

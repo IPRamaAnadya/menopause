@@ -80,22 +80,26 @@ export class SubscriptionService {
     const limit = options?.limit || 10;
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: any = {
+      type: {
+        in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE'],
+      },
+    };
 
-    // Map activity type filter to membership status
+    // Map activity type filter to order status
     if (options?.status && options.status !== 'all') {
       const statusUpper = options.status.toUpperCase();
       
-      if (statusUpper === 'CREATED' || statusUpper === 'RENEWED') {
-        // Both CREATED and RENEWED are ACTIVE memberships
-        where.status = 'ACTIVE';
+      if (statusUpper === 'CREATED') {
+        where.type = 'MEMBERSHIP_PURCHASE';
+      } else if (statusUpper === 'RENEWED') {
+        where.type = 'MEMBERSHIP_RENEWAL';
+      } else if (statusUpper === 'UPGRADED') {
+        where.type = 'MEMBERSHIP_UPGRADE';
       } else if (statusUpper === 'CANCELLED') {
         where.status = 'CANCELLED';
       } else if (statusUpper === 'EXPIRED') {
-        where.status = 'EXPIRED';
-      } else {
-        // Direct status match (ACTIVE, EXPIRED, CANCELLED)
-        where.status = statusUpper;
+        where.status = 'FAILED';
       }
     }
 
@@ -118,18 +122,16 @@ export class SubscriptionService {
           },
         },
         {
-          membership_levels: {
-            name: {
-              contains: options.search,
-              mode: 'insensitive',
-            },
+          order_number: {
+            contains: options.search,
+            mode: 'insensitive',
           },
         },
       ];
     }
 
-    const [memberships, total] = await Promise.all([
-      prisma.memberships.findMany({
+    const [orders, total] = await Promise.all([
+      prisma.orders.findMany({
         where,
         include: {
           users: {
@@ -139,11 +141,15 @@ export class SubscriptionService {
               email: true,
             },
           },
-          membership_levels: {
+          payments: {
             select: {
               id: true,
-              name: true,
-              price: true,
+              status: true,
+              amount: true,
+            },
+            take: 1,
+            orderBy: {
+              created_at: 'desc',
             },
           },
         },
@@ -153,67 +159,96 @@ export class SubscriptionService {
         skip,
         take: limit,
       }),
-      prisma.memberships.count({ where }),
+      prisma.orders.count({ where }),
     ]);
 
-    const activities = memberships.map(m => {
-      let activityType: 'CREATED' | 'UPDATED' | 'CANCELLED' | 'EXPIRED' | 'RENEWED' = 'CREATED';
-      let description = '';
+    const activities = await Promise.all(
+      orders.map(async (order) => {
+        // Map order type to activity type
+        let activityType: 'CREATED' | 'UPDATED' | 'CANCELLED' | 'EXPIRED' | 'RENEWED' = 'CREATED';
+        let description = '';
 
-      if (m.status === 'CANCELLED') {
-        activityType = 'CANCELLED';
-        description = `Membership cancelled for ${m.users.name}`;
-      } else if (m.status === 'EXPIRED') {
-        activityType = 'EXPIRED';
-        description = `Membership expired for ${m.users.name}`;
-      } else if (m.status === 'ACTIVE') {
-        const daysSinceCreated = Math.floor(
-          (new Date().getTime() - new Date(m.created_at).getTime()) / (1000 * 60 * 60 * 24)
-        );
-        if (daysSinceCreated > 7) {
-          activityType = 'RENEWED';
-          description = `Membership renewed for ${m.users.name} - ${m.membership_levels.name}`;
-        } else {
+        if (order.type === 'MEMBERSHIP_PURCHASE') {
           activityType = 'CREATED';
-          description = `New ${m.membership_levels.name} membership for ${m.users.name}`;
+          description = `New membership purchase for ${order.users.name}`;
+        } else if (order.type === 'MEMBERSHIP_RENEWAL') {
+          activityType = 'RENEWED';
+          description = `Membership renewed for ${order.users.name}`;
+        } else if (order.type === 'MEMBERSHIP_UPGRADE') {
+          activityType = 'UPDATED';
+          description = `Membership upgraded for ${order.users.name}`;
         }
-      }
 
-      return {
-        id: m.id,
-        user_id: m.user_id,
-        user: m.users,
-        membership_id: m.id,
-        membership: {
-          id: m.id,
-          status: m.status,
-          start_date: m.start_date,
-          end_date: m.end_date,
-          membership_level: {
-            id: m.membership_levels.id,
-            name: m.membership_levels.name,
-            price: parseFloat(m.membership_levels.price.toString()),
+        if (order.status === 'CANCELLED') {
+          activityType = 'CANCELLED';
+          description = `Order cancelled for ${order.users.name}`;
+        } else if (order.status === 'FAILED') {
+          activityType = 'EXPIRED';
+          description = `Order failed for ${order.users.name}`;
+        }
+
+        // Get membership info from order metadata or reference
+        let membership = null;
+        let membershipLevel = null;
+
+        if (order.reference_id && order.reference_type === 'membership') {
+          membership = await prisma.memberships.findUnique({
+            where: { id: order.reference_id },
+            include: {
+              membership_levels: true,
+            },
+          });
+
+          if (membership) {
+            membershipLevel = {
+              id: membership.membership_levels.id,
+              name: membership.membership_levels.name,
+              price: parseFloat(membership.membership_levels.price.toString()),
+            };
+          }
+        }
+
+        // Fallback to breakdown data if membership not found
+        const breakdown = order.breakdown as any;
+        if (!membershipLevel && breakdown?.items && breakdown.items.length > 0) {
+          const item = breakdown.items[0];
+          membershipLevel = {
+            id: 0,
+            name: item.description || 'Membership',
+            price: parseFloat(item.amount || order.gross_amount.toString()),
+          };
+        }
+
+        // Default membership level
+        if (!membershipLevel) {
+          membershipLevel = {
+            id: 0,
+            name: 'Membership',
+            price: parseFloat(order.gross_amount.toString()),
+          };
+        }
+
+        return {
+          id: order.id,
+          user_id: order.user_id,
+          user: order.users,
+          membership_id: order.reference_id || order.id,
+          membership: {
+            id: order.reference_id || order.id,
+            status: order.status === 'PAID' ? 'ACTIVE' : order.status === 'CANCELLED' ? 'CANCELLED' : order.status === 'FAILED' ? 'EXPIRED' : 'PENDING',
+            start_date: membership?.start_date || order.created_at,
+            end_date: membership?.end_date || order.expires_at || new Date(new Date(order.created_at).setMonth(new Date(order.created_at).getMonth() + 1)),
+            membership_level: membershipLevel,
           },
-        },
-        activity_type: activityType,
-        description,
-        created_at: m.created_at,
-      };
-    });
-
-    // Post-filter for specific activity types (CREATED vs RENEWED)
-    let filteredActivities = activities;
-    if (options?.status && options.status !== 'all') {
-      const statusUpper = options.status.toUpperCase();
-      if (statusUpper === 'CREATED') {
-        filteredActivities = activities.filter(a => a.activity_type === 'CREATED');
-      } else if (statusUpper === 'RENEWED') {
-        filteredActivities = activities.filter(a => a.activity_type === 'RENEWED');
-      }
-    }
+          activity_type: activityType,
+          description,
+          created_at: order.created_at,
+        };
+      })
+    );
 
     return {
-      data: filteredActivities,
+      data: activities,
       pagination: {
         total,
         page,
@@ -231,7 +266,7 @@ export class SubscriptionService {
     const orders = await prisma.orders.findMany({
       where: {
         user_id: userId,
-        order_type: {
+        type: {
           in: ['MEMBERSHIP_PURCHASE', 'MEMBERSHIP_RENEWAL', 'MEMBERSHIP_UPGRADE'],
         },
       },
@@ -241,14 +276,6 @@ export class SubscriptionService {
             id: true,
             amount: true,
             status: true,
-            metadata: true,
-          },
-        },
-        membership_levels: {
-          select: {
-            id: true,
-            name: true,
-            price: true,
           },
         },
       },
@@ -260,51 +287,77 @@ export class SubscriptionService {
     // Map orders to activities
     const activities = await Promise.all(
       orders.map(async (order) => {
-        // Get the payment metadata to find operation type and membership ID
-        const payment = order.payments[0];
-        const metadata = payment?.metadata as any;
-        
-        // Determine activity type from order type and metadata
+        // Determine activity type from order type
         let activityType: 'NEW' | 'EXTEND' | 'UPGRADE' | 'DOWNGRADE' | 'CANCELLED' | 'EXPIRED' = 'NEW';
-        if (metadata?.operation_type) {
-          activityType = metadata.operation_type;
-        } else if (order.order_type === 'MEMBERSHIP_RENEWAL') {
+        if (order.type === 'MEMBERSHIP_RENEWAL') {
           activityType = 'EXTEND';
-        } else if (order.order_type === 'MEMBERSHIP_UPGRADE') {
+        } else if (order.type === 'MEMBERSHIP_UPGRADE') {
           activityType = 'UPGRADE';
-        } else if (order.order_type === 'MEMBERSHIP_PURCHASE') {
+        } else if (order.type === 'MEMBERSHIP_PURCHASE') {
           activityType = 'NEW';
         }
 
-        // Get the membership created/updated by this order
-        let membershipStatus = 'ACTIVE';
-        if (metadata?.membership_id) {
-          const membership = await prisma.memberships.findUnique({
-            where: { id: parseInt(metadata.membership_id) },
-            select: { status: true },
+        // Override with order status if cancelled or failed
+        if (order.status === 'CANCELLED') {
+          activityType = 'CANCELLED';
+        } else if (order.status === 'FAILED') {
+          activityType = 'EXPIRED';
+        }
+
+        // Get membership info from reference or breakdown
+        let membership = null;
+        let membershipLevel = null;
+
+        if (order.reference_id && order.reference_type === 'membership') {
+          membership = await prisma.memberships.findUnique({
+            where: { id: order.reference_id },
+            include: {
+              membership_levels: true,
+            },
           });
+
           if (membership) {
-            membershipStatus = membership.status;
+            membershipLevel = {
+              id: membership.membership_levels.id,
+              name: membership.membership_levels.name,
+              price: parseFloat(membership.membership_levels.price.toString()),
+            };
           }
+        }
+
+        // Fallback to breakdown data
+        const breakdown = order.breakdown as any;
+        if (!membershipLevel && breakdown?.items && breakdown.items.length > 0) {
+          const item = breakdown.items[0];
+          membershipLevel = {
+            id: 0,
+            name: item.description || 'Membership',
+            price: parseFloat(item.amount || order.gross_amount.toString()),
+          };
+        }
+
+        // Default fallback
+        if (!membershipLevel) {
+          membershipLevel = {
+            id: 0,
+            name: 'Membership',
+            price: parseFloat(order.gross_amount.toString()),
+          };
         }
 
         return {
           id: order.id,
           user_id: order.user_id,
-          membership_id: metadata?.membership_id || null,
+          membership_id: order.reference_id || null,
           membership: {
-            id: metadata?.membership_id || order.id,
-            status: membershipStatus,
-            start_date: order.created_at,
-            end_date: new Date(new Date(order.created_at).setMonth(new Date(order.created_at).getMonth() + 1)),
-            membership_level: {
-              id: order.membership_levels?.id || 0,
-              name: order.membership_levels?.name || 'Unknown',
-              price: order.total_amount ? parseFloat(order.total_amount.toString()) : 0,
-            },
+            id: order.reference_id || order.id,
+            status: order.status === 'PAID' ? 'ACTIVE' : order.status === 'CANCELLED' ? 'CANCELLED' : order.status === 'FAILED' ? 'EXPIRED' : 'PENDING',
+            start_date: membership?.start_date || order.created_at,
+            end_date: membership?.end_date || order.expires_at || new Date(new Date(order.created_at).setMonth(new Date(order.created_at).getMonth() + 1)),
+            membership_level: membershipLevel,
           },
           activity_type: activityType,
-          description: `${order.membership_levels?.name || 'Membership'} - ${activityType}`,
+          description: `${membershipLevel.name} - ${activityType}`,
           created_at: order.created_at,
         };
       })

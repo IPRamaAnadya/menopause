@@ -1,7 +1,30 @@
 export const siteConfig = {
   name: "The Hong Kong Menopause Society",
-  description: "Your comprehensive menopause health management platform",
-  url: "https://menopause.example.com",
+  description: "Your comprehensive menopause health management platform. Access expert advice, resources, and support for every stage of menopause. Empowering women in Hong Kong to thrive through knowledge and community.",
+  url: "https://menopause-dev.mapunia.com",
+  
+  // SEO Keywords
+  keywords: [
+    "menopause",
+    "menopause support",
+    "women's health",
+    "Hong Kong menopause",
+    "menopause symptoms",
+    "hormone therapy",
+    "menopause management",
+    "perimenopause",
+    "postmenopause",
+    "menopause clinic",
+    "menopause advice",
+    "women's health Hong Kong",
+    "menopause treatment",
+    "menopause care",
+    "midlife health"
+  ],
+  
+  // Open Graph / Social Media
+  ogImage: "/og-image.jpg", // Default OG image
+  twitterHandle: "@menopauseHK",
   
   // Brand Colors (can be changed easily)
   colors: {

@@ -8,6 +8,7 @@ import { SessionProvider } from '@/providers/SessionProvider';
 import { siteConfig } from '@/config/site';
 import { Inter, Crimson_Text, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import "leaflet/dist/leaflet.css";
 
 // Configure fonts from site config
 const fontSans = Inter({

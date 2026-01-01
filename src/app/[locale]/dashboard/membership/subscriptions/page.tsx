@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -19,7 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Pagination } from "@/components/ui/pagination";
-import { Search, TrendingUp, Users, XCircle, Calendar, DollarSign } from "lucide-react";
+import { Search, TrendingUp, Users, XCircle, Calendar, DollarSign, CheckCircle } from "lucide-react";
 import { SubscriptionActivity, SubscriptionStats } from "@/features/membership/types";
 
 interface PaginationData {
@@ -153,35 +154,78 @@ export default function SubscriptionsPage() {
 
       {/* Stats Cards */}
       {stats && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <div className="rounded-lg border bg-card p-6">
-            <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-muted-foreground" />
-              <h3 className="text-sm font-medium text-muted-foreground">{t("stats.total")}</h3>
-            </div>
-            <p className="text-3xl font-bold mt-2">{stats.total_subscriptions}</p>
-            <div className="flex gap-4 mt-2 text-sm">
-              <span className="text-green-600">{stats.active_subscriptions} {t("stats.active")}</span>
-              <span className="text-red-600">{stats.expired_subscriptions} {t("stats.expired")}</span>
-              <span className="text-gray-600">{stats.cancelled_subscriptions} {t("stats.cancelled")}</span>
-            </div>
-          </div>
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium line-clamp-2">
+                {t("stats.total")}
+              </CardTitle>
+              <Users className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
+            </CardHeader>
+            <CardContent className="p-3 sm:p-6 pt-0">
+              <div className="text-xl sm:text-2xl font-bold">{stats.total_subscriptions}</div>
+            </CardContent>
+          </Card>
 
-          <div className="rounded-lg border bg-card p-6">
-            <div className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-muted-foreground" />
-              <h3 className="text-sm font-medium text-muted-foreground">{t("stats.totalRevenue")}</h3>
-            </div>
-            <p className="text-3xl font-bold mt-2">{formatCurrency(stats.total_revenue)}</p>
-          </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium line-clamp-2">
+                {t("stats.active")}
+              </CardTitle>
+              <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-600 flex-shrink-0" />
+            </CardHeader>
+            <CardContent className="p-3 sm:p-6 pt-0">
+              <div className="text-xl sm:text-2xl font-bold text-green-600">{stats.active_subscriptions}</div>
+            </CardContent>
+          </Card>
 
-          <div className="rounded-lg border bg-card p-6">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-muted-foreground" />
-              <h3 className="text-sm font-medium text-muted-foreground">{t("stats.monthlyRevenue")}</h3>
-            </div>
-            <p className="text-3xl font-bold mt-2">{formatCurrency(stats.monthly_revenue)}</p>
-          </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium line-clamp-2">
+                {t("stats.expired")}
+              </CardTitle>
+              <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-red-600 flex-shrink-0" />
+            </CardHeader>
+            <CardContent className="p-3 sm:p-6 pt-0">
+              <div className="text-xl sm:text-2xl font-bold text-red-600">{stats.expired_subscriptions}</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium line-clamp-2">
+                {t("stats.cancelled")}
+              </CardTitle>
+              <XCircle className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600 flex-shrink-0" />
+            </CardHeader>
+            <CardContent className="p-3 sm:p-6 pt-0">
+              <div className="text-xl sm:text-2xl font-bold text-gray-600">{stats.cancelled_subscriptions}</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium line-clamp-2">
+                {t("stats.totalRevenue")}
+              </CardTitle>
+              <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
+            </CardHeader>
+            <CardContent className="p-3 sm:p-6 pt-0">
+              <div className="text-xl sm:text-2xl font-bold">{formatCurrency(stats.total_revenue)}</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium line-clamp-2">
+                {t("stats.monthlyRevenue")}
+              </CardTitle>
+              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
+            </CardHeader>
+            <CardContent className="p-3 sm:p-6 pt-0">
+              <div className="text-xl sm:text-2xl font-bold">{formatCurrency(stats.monthly_revenue)}</div>
+            </CardContent>
+          </Card>
         </div>
       )}
 

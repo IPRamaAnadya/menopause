@@ -1,0 +1,412 @@
+"use client";
+
+import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/routing";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { useEventActions } from "@/features/event/hooks/useEventActions";
+import { EventStatus } from "@/generated/prisma";
+
+export default function CreateEventPage() {
+  const t = useTranslations('EventsManagement');
+  const router = useRouter();
+  const { createEvent, loading } = useEventActions(() => router.push('/dashboard/events'));
+
+  const [formData, setFormData] = useState({
+    slug: "",
+    image_url: "",
+    start_date: "",
+    end_date: "",
+    start_time: "",
+    end_time: "",
+    is_online: false,
+    meeting_url: "",
+    is_paid: false,
+    capacity: "",
+    is_public: true,
+    status: EventStatus.DRAFT as EventStatus,
+    translations: [
+      { locale: "en", title: "", short_description: "", description: "", place_name: "", place_details: "" },
+      { locale: "zh-HK", title: "", short_description: "", description: "", place_name: "", place_details: "" },
+    ],
+    prices: [
+      { membership_level_id: null, price: 0, quota: null, is_active: true }
+    ],
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const data = {
+        ...formData,
+        capacity: formData.capacity ? parseInt(formData.capacity) : null,
+        prices: formData.is_paid ? formData.prices : [],
+      };
+      await createEvent(data);
+    } catch (error) {
+      console.error('Error creating event:', error);
+    }
+  };
+
+  const generateSlug = (title: string) => {
+    return title
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  };
+
+  const handleEnglishTitleChange = (title: string) => {
+    const newTranslations = [...formData.translations];
+    newTranslations[0] = { ...newTranslations[0], title };
+    const slug = generateSlug(title);
+    setFormData({ ...formData, translations: newTranslations, slug });
+  };
+
+  const handleTranslationChange = (index: number, field: string, value: string) => {
+    const newTranslations = [...formData.translations];
+    newTranslations[index] = { ...newTranslations[index], [field]: value };
+    setFormData({ ...formData, translations: newTranslations });
+  };
+
+  return (
+    <div className="space-y-6 p-4 sm:p-6 max-w-5xl mx-auto">
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => router.push('/dashboard/events')}
+          className="rounded-full border-2 border-accent"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            {t('form.createTitle')}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {t('form.createDescription')}
+          </p>
+        </div>
+      </div>
+
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="rounded-lg border bg-card p-6 space-y-6">
+          {/* Basic Information */}
+          <div>
+            <h2 className="text-lg font-semibold mb-4">{t('form.basicInfo')}</h2>
+            <div className="space-y-4">
+              {/* Status and Public */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="status">{t('form.status')}</Label>
+                  <Select
+                    value={formData.status}
+                    onValueChange={(value) => setFormData({ ...formData, status: value as EventStatus })}
+                  >
+                    <SelectTrigger id="status">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EventStatus.DRAFT}>{t('status.draft')}</SelectItem>
+                      <SelectItem value={EventStatus.PUBLISHED}>{t('status.published')}</SelectItem>
+                      <SelectItem value={EventStatus.CANCELLED}>{t('status.cancelled')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="capacity">{t('form.capacity')}</Label>
+                  <Input
+                    id="capacity"
+                    type="number"
+                    value={formData.capacity}
+                    onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
+                    placeholder={t('form.capacityPlaceholder')}
+                  />
+                </div>
+              </div>
+
+              {/* Image URL */}
+              <div className="space-y-2">
+                <Label htmlFor="image_url">{t('form.imageUrl')}</Label>
+                <Input
+                  id="image_url"
+                  value={formData.image_url}
+                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                  placeholder="https://example.com/image.jpg"
+                />
+              </div>
+
+              {/* Date and Time */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="start_date">{t('form.startDate')} *</Label>
+                  <Input
+                    id="start_date"
+                    type="date"
+                    value={formData.start_date}
+                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="start_time">{t('form.startTime')}</Label>
+                  <Input
+                    id="start_time"
+                    type="time"
+                    value={formData.start_time}
+                    onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="end_date">{t('form.endDate')} *</Label>
+                  <Input
+                    id="end_date"
+                    type="date"
+                    value={formData.end_date}
+                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="end_time">{t('form.endTime')}</Label>
+                  <Input
+                    id="end_time"
+                    type="time"
+                    value={formData.end_time}
+                    onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              {/* Switches */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="is_online">{t('form.isOnline')}</Label>
+                    <p className="text-sm text-muted-foreground">{t('form.isOnlineDescription')}</p>
+                  </div>
+                  <Switch
+                    id="is_online"
+                    checked={formData.is_online}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_online: checked })}
+                  />
+                </div>
+
+                {formData.is_online && (
+                  <div className="space-y-2">
+                    <Label htmlFor="meeting_url">{t('form.meetingUrl')}</Label>
+                    <Input
+                      id="meeting_url"
+                      value={formData.meeting_url}
+                      onChange={(e) => setFormData({ ...formData, meeting_url: e.target.value })}
+                      placeholder="https://zoom.us/j/123456789"
+                    />
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="is_paid">{t('form.isPaid')}</Label>
+                    <p className="text-sm text-muted-foreground">{t('form.isPaidDescription')}</p>
+                  </div>
+                  <Switch
+                    id="is_paid"
+                    checked={formData.is_paid}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_paid: checked })}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="is_public">{t('form.isPublic')}</Label>
+                    <p className="text-sm text-muted-foreground">{t('form.isPublicDescription')}</p>
+                  </div>
+                  <Switch
+                    id="is_public"
+                    checked={formData.is_public}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_public: checked })}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* English Translation */}
+          <div>
+            <h2 className="text-lg font-semibold mb-4">{t('form.englishContent')}</h2>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="en-title">{t('form.title')} *</Label>
+                <Input
+                  id="en-title"
+                  value={formData.translations[0].title}
+                  onChange={(e) => handleEnglishTitleChange(e.target.value)}
+                  placeholder={t('form.titlePlaceholder')}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="slug">{t('form.slug')}</Label>
+                <Input
+                  id="slug"
+                  value={formData.slug}
+                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  placeholder="event-slug"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="en-short">{t('form.shortDescription')}</Label>
+                <Textarea
+                  id="en-short"
+                  value={formData.translations[0].short_description}
+                  onChange={(e) => handleTranslationChange(0, 'short_description', e.target.value)}
+                  placeholder={t('form.shortDescriptionPlaceholder')}
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="en-description">{t('form.description')}</Label>
+                <Textarea
+                  id="en-description"
+                  value={formData.translations[0].description}
+                  onChange={(e) => handleTranslationChange(0, 'description', e.target.value)}
+                  placeholder={t('form.descriptionPlaceholder')}
+                  rows={6}
+                />
+              </div>
+
+              {!formData.is_online && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="en-place">{t('form.placeName')}</Label>
+                    <Input
+                      id="en-place"
+                      value={formData.translations[0].place_name}
+                      onChange={(e) => handleTranslationChange(0, 'place_name', e.target.value)}
+                      placeholder={t('form.placeNamePlaceholder')}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="en-place-details">{t('form.placeDetails')}</Label>
+                    <Textarea
+                      id="en-place-details"
+                      value={formData.translations[0].place_details}
+                      onChange={(e) => handleTranslationChange(0, 'place_details', e.target.value)}
+                      placeholder={t('form.placeDetailsPlaceholder')}
+                      rows={3}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Chinese Translation */}
+          <div>
+            <h2 className="text-lg font-semibold mb-4">{t('form.chineseContent')}</h2>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="zh-title">{t('form.title')} *</Label>
+                <Input
+                  id="zh-title"
+                  value={formData.translations[1].title}
+                  onChange={(e) => handleTranslationChange(1, 'title', e.target.value)}
+                  placeholder={t('form.titlePlaceholder')}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="zh-short">{t('form.shortDescription')}</Label>
+                <Textarea
+                  id="zh-short"
+                  value={formData.translations[1].short_description}
+                  onChange={(e) => handleTranslationChange(1, 'short_description', e.target.value)}
+                  placeholder={t('form.shortDescriptionPlaceholder')}
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="zh-description">{t('form.description')}</Label>
+                <Textarea
+                  id="zh-description"
+                  value={formData.translations[1].description}
+                  onChange={(e) => handleTranslationChange(1, 'description', e.target.value)}
+                  placeholder={t('form.descriptionPlaceholder')}
+                  rows={6}
+                />
+              </div>
+
+              {!formData.is_online && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="zh-place">{t('form.placeName')}</Label>
+                    <Input
+                      id="zh-place"
+                      value={formData.translations[1].place_name}
+                      onChange={(e) => handleTranslationChange(1, 'place_name', e.target.value)}
+                      placeholder={t('form.placeNamePlaceholder')}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="zh-place-details">{t('form.placeDetails')}</Label>
+                    <Textarea
+                      id="zh-place-details"
+                      value={formData.translations[1].place_details}
+                      onChange={(e) => handleTranslationChange(1, 'place_details', e.target.value)}
+                      placeholder={t('form.placeDetailsPlaceholder')}
+                      rows={3}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Submit Buttons */}
+        <div className="flex gap-4 justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.push('/dashboard/events')}
+            disabled={loading}
+          >
+            {t('form.cancel')}
+          </Button>
+          <Button type="submit" disabled={loading}>
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {t('form.create')}
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+}

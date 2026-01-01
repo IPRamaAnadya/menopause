@@ -33,7 +33,11 @@
       "memberSubscription": "Member Subscription",
       "articleManagement": "Article",
       "categoryManagement": "Category Management",
-      "articlesManagement": "Articles Management"
+      "articlesManagement": "Articles Management",
+      "eventManagement": "Event Management",
+      "eventsManagement": "Events Management",
+      "eventRegistrationsOverview": "Registrations Overview",
+      "eventRegistrationsHistory": "Registration History"
     },
     "footer": {
       "version": "Version"
@@ -498,6 +502,122 @@
       "updating": "Updating..."
     }
   },
+  "EventsManagement": {
+    "title": "Events Management",
+    "subtitle": "Manage all events",
+    "addButton": "Add Event",
+    "search": "Search events...",
+    "allStatus": "All Status",
+    "noEvents": "No events found",
+    "getStarted": "Get started by creating your first event",
+    "capacity": "Capacity",
+    "status": {
+      "published": "Published",
+      "draft": "Draft",
+      "cancelled": "Cancelled"
+    },
+    "type": {
+      "online": "Online",
+      "offline": "Offline",
+      "paid": "Paid",
+      "free": "Free",
+      "highlighted": "Featured"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteConfirm": "Are you sure you want to delete this event?",
+      "registrations": "Registrations"
+    },
+    "loading": "Loading Events...",
+    "showing": "Showing",
+    "of": "of",
+    "previous": "Previous",
+    "next": "Next",
+    "filters": {
+      "time": "Time",
+      "allTime": "All Time",
+      "upcoming": "Upcoming",
+      "ongoing": "Ongoing",
+      "passed": "Passed",
+      "location": "Location",
+      "allLocation": "All Locations",
+      "online": "Online",
+      "offline": "In-Person",
+      "visibility": "Visibility",
+      "allVisibility": "All",
+      "public": "Public",
+      "private": "Private",
+      "payment": "Payment",
+      "allPayment": "All",
+      "paid": "Paid",
+      "free": "Free",
+      "highlight": "Highlight",
+      "allHighlight": "All",
+      "highlighted": "Highlighted",
+      "normal": "Normal"
+    },
+    "form": {
+      "createTitle": "Create New Event",
+      "createDescription": "Fill in the details to create a new event",
+      "editTitle": "Edit Event",
+      "editDescription": "Update the event details below",
+      "basicInfo": "Basic Information",
+      "status": "Status",
+      "capacity": "Capacity",
+      "capacityPlaceholder": "Leave empty for unlimited",
+      "imageUrl": "Image URL",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "startTime": "Start Time",
+      "endTime": "End Time",
+      "isOnline": "Online Event",
+      "isOnlineDescription": "This event will be held online",
+      "meetingUrl": "Meeting URL",
+      "isPaid": "Paid Event",
+      "isPaidDescription": "This event requires payment",
+      "isPublic": "Public Event",
+      "isPublicDescription": "Anyone can view and register for this event",
+      "isHighlighted": "Highlighted Event",
+      "isHighlightedDescription": "This event will be featured in the highlighted section on the main page",
+      "englishContent": "English Content",
+      "chineseContent": "Chinese Content",
+      "title": "Title",
+      "titlePlaceholder": "Enter event title",
+      "slug": "Slug",
+      "shortDescription": "Short Description",
+      "shortDescriptionPlaceholder": "Brief summary of the event",
+      "description": "Full Description",
+      "descriptionPlaceholder": "Detailed event description",
+      "placeName": "Venue Name",
+      "placeNamePlaceholder": "e.g., Hong Kong Convention Centre",
+      "placeDetails": "Venue Details",
+      "placeDetailsPlaceholder": "Address and directions",
+      "cancel": "Cancel",
+      "create": "Create Event",
+      "update": "Update Event",
+      "creating": "Creating...",
+      "updating": "Updating...",
+      "translations": "Translations"
+    },
+    "registrations": {
+      "title": "Event Registrations",
+      "total": "Total Registrations",
+      "paid": "Paid",
+      "pending": "Pending",
+      "attended": "Attended",
+      "noRegistrations": "No registrations yet",
+      "noRegistrationsDescription": "Registrations will appear here when people sign up",
+      "name": "Name",
+      "email": "Email",
+      "price": "Price",
+      "status": "Status",
+      "registeredAt": "Registered At",
+      "searchPlaceholder": "Search by name or email...",
+      "filterByStatus": "Filter by status",
+      "allStatuses": "All Statuses"
+    }
+  },
   "MainSite": {
     "nav": {
       "home": "Home",
@@ -593,6 +713,148 @@
         "link": "Show all events"
       }
     },
+    "events": {
+      "page": {
+        "badge": "Events",
+        "heading": "Browse Our Events",
+        "description": "Join our community events, workshops, and gatherings designed to educate, empower, and support women through menopause."
+      },
+      "searchPlaceholder": "Search events...",
+      "filters": {
+        "time": "Time",
+        "allTime": "All Time",
+        "upcoming": "Upcoming",
+        "ongoing": "Ongoing",
+        "passed": "Passed",
+        "location": "Location",
+        "allLocation": "All Locations",
+        "online": "Online",
+        "offline": "In-Person",
+        "payment": "Payment",
+        "allPayment": "All",
+        "paid": "Paid",
+        "free": "Free"
+      },
+      "readMore": "View Details",
+      "capacity": "Capacity",
+      "pricingWithMembership": "Price varies by membership level",
+      "pricingPublic": "Public price",
+      "noEvents": "No events found",
+      "noEventsDescription": "Check back soon for upcoming events.",
+      "noSearchResults": "No events found matching your search.",
+      "searchSuggestion": "Try adjusting your filters or search terms.",
+      "errorTitle": "Unable to load events",
+      "showing": "Showing",
+      "of": "of",
+      "previous": "Previous",
+      "next": "Next",
+      "backToEvents": "Back to Events",
+      "notFound": "Event Not Found",
+      "errorLoading": "Error Loading Event",
+      "to": "to",
+      "location": {
+        "onlineEvent": "Online Event",
+        "joinMeeting": "Join Meeting"
+      },
+      "about": "About This Event",
+      "register": "Register Now",
+      "share": "Share",
+      "featured": "Featured",
+      "badges": {
+        "online": "Online",
+        "inPerson": "In-Person",
+        "paid": "Paid",
+        "free": "Free",
+        "public": "Public",
+        "membersOnly": "Members Only"
+      },
+      "details": {
+        "dateTime": "Date & Time",
+        "duration": "Duration",
+        "location": "Location",
+        "venue": "Venue",
+        "capacity": "Capacity",
+        "participants": "participants",
+        "addToCalendar": "Add to Calendar"
+      },
+      "pricing": {
+        "free": "Free Event",
+        "freeDescription": "No registration fee required",
+        "public": "Public (Non-members)",
+        "publicDescription": "Price for non-members",
+        "yourPrice": "Your membership price",
+        "cheaperPrices": "Cheaper membership options",
+        "quota": "Quota"
+      },
+      "registration": {
+        "title": "Registration",
+        "loginRequired": "Login required to register",
+        "upgradeMembership": "Upgrade Membership",
+        "joinMembership": "Join to Membership",
+        "backToEvent": "Back to Event",
+        "eventSummary": "Event Summary",
+        "yourPrice": "Your Price",
+        "loggedInDescription": "Complete your registration for this event.",
+        "guestDescription": "Register as a guest or sign in to get member pricing.",
+        "registeringAs": "Registering as",
+        "membershipActive": "Active Membership",
+        "guestInfo": "You're registering as a guest. Want member benefits?",
+        "login": "Sign in",
+        "form": {
+          "fullName": "Full Name",
+          "fullNamePlaceholder": "Enter your full name",
+          "name": "Name",
+          "email": "Email",
+          "emailPlaceholder": "your.email@example.com",
+          "phone": "Phone Number",
+          "phonePlaceholder": "+852 1234 5678"
+        },
+        "proceedToPayment": "Proceed to Payment",
+        "confirmRegistration": "Confirm Registration",
+        "agreement": "By registering, you agree to our terms and conditions.",
+        "errorTitle": "Registration Error",
+        "notFound": "Registration not found",
+        "alreadyRegistered": "You have already registered for this event. Check your email for confirmation details.",
+        "success": {
+          "title": "Registration Confirmed!",
+          "description": "You have successfully registered for this event.",
+          "details": "Registration Details",
+          "confirmationNumber": "Confirmation Number",
+          "scanQR": "Scan for quick access",
+          "registrantInfo": "Registrant Information",
+          "orderDetails": "Order Details",
+          "registrationStatus": "Registration Status",
+          "orderNumber": "Order Number",
+          "orderStatus": "Payment Status",
+          "paymentMethod": "Payment Method",
+          "amount": "Amount",
+          "paidAt": "Paid Date",
+          "payment": "Payment",
+          "amountPaid": "Amount Paid",
+          "nextSteps": "What's Next?",
+          "emailSent": "A confirmation email has been sent to your email address with event details.",
+          "addCalendar": "Add this event to your calendar so you don't miss it.",
+          "onlineLink": "For online events, you'll receive the meeting link via email before the event.",
+          "viewEvent": "View Event Details",
+          "browseEvents": "Browse More Events"
+        }
+      },
+      "organizer": {
+        "title": "Organizer",
+        "description": "Event organized by our team"
+      },
+      "eventInfo": {
+        "title": "Event Information",
+        "eventId": "Event ID",
+        "status": "Status",
+        "featured": "Featured Event"
+      },
+      "map": {
+        "title": "Location",
+        "getDirections": "Get Directions",
+        "openInMaps": "Open in Maps"
+      }
+    },
     "testimonial": {
       "badge": "what they said",
       "title": "From Our Community",
@@ -614,6 +876,11 @@
       "badge": "Featured Content",
       "title": "HIGHLIGHTED ARTICLES",
       "subtitle": "Discover our most important articles handpicked by experts to guide your menopause journey."
+    },
+    "highlightedEvents": {
+      "badge": "Featured Events",
+      "title": "UPCOMING HIGHLIGHTED EVENTS",
+      "subtitle": "Don't miss our featured events designed to educate and support your menopause journey."
     },
     "articles": {
       "badge": "Interesting Articles",
@@ -791,7 +1058,8 @@
         "UPDATED": "Updated",
         "CANCELLED": "Cancelled",
         "EXPIRED": "Expired",
-        "RENEWED": "Renewed"
+        "RENEWED": "Renewed",
+        "DOWNGRADED": "Downgraded"
       }
     },
     "table": {
@@ -947,6 +1215,77 @@
       "languageInfo": "Use the language switcher in the navigation to change languages"
     }
   },
+  "EventRegistrationsOverview": {
+    "title": "Event Registrations Overview",
+    "subtitle": "View statistics and insights for all event registrations",
+    "statistics": {
+      "totalRegistrations": "Total Registrations",
+      "paidRegistrations": "Paid",
+      "pendingRegistrations": "Pending",
+      "cancelledRegistrations": "Cancelled",
+      "attendedRegistrations": "Attended",
+      "totalRevenue": "Total Revenue"
+    },
+    "topEvents": {
+      "title": "Top Events by Registrations",
+      "eventName": "Event Name",
+      "registrations": "Registrations",
+      "noData": "No event data available"
+    },
+    "recentRegistrations": {
+      "title": "Recent Registrations",
+      "attendee": "Attendee",
+      "event": "Event",
+      "price": "Price",
+      "status": "Status",
+      "registeredAt": "Registered",
+      "noData": "No recent registrations"
+    },
+    "status": {
+      "PENDING": "Pending",
+      "PAID": "Paid",
+      "CANCELLED": "Cancelled",
+      "ATTENDED": "Attended"
+    },
+    "viewAll": "View All Registrations"
+  },
+  "EventRegistrationsHistory": {
+    "title": "Event Registration History",
+    "subtitle": "View and manage all event registrations",
+    "search": "Search by name or email...",
+    "filters": {
+      "allStatus": "All Status",
+      "allEvents": "All Events"
+    },
+    "table": {
+      "attendee": "Attendee",
+      "event": "Event",
+      "membershipLevel": "Membership Level",
+      "price": "Price",
+      "status": "Status",
+      "registeredAt": "Registered At",
+      "actions": "Actions"
+    },
+    "status": {
+      "PENDING": "Pending",
+      "PAID": "Paid",
+      "CANCELLED": "Cancelled",
+      "ATTENDED": "Attended"
+    },
+    "membershipLevel": {
+      "public": "Public",
+      "none": "None"
+    },
+    "pagination": {
+      "showing": "Showing {from}-{to} of {total} registrations",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "noRegistrations": "No registrations found",
+    "getStarted": "Event registrations will appear here",
+    "loading": "Loading registrations...",
+    "guest": "Guest"
+  },
   "Admin": {
     "memberships": {
       "overview": "Membership Overview",
@@ -966,6 +1305,45 @@
       "showing": "Showing {from} to {to} of {total} members",
       "previous": "Previous",
       "next": "Next"
+    }
+  },
+  "Common": {
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "save": "Save",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "actions": "Actions",
+    "status": "Status",
+    "date": "Date",
+    "time": "Time",
+    "location": "Location",
+    "description": "Description",
+    "title": "Title",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "city": "City",
+    "country": "Country",
+    "zipCode": "Zip Code",
+    "form": {
+      "required": "This field is required",
+      "invalidEmail": "Please enter a valid email address",
+      "invalidPhone": "Please enter a valid phone number",
+      "invalidUrl": "Please enter a valid URL",
+      "minLength": "Must be at least {min} characters",
+      "maxLength": "Must be no more than {max} characters",
+      "passwordMismatch": "Passwords do not match",
+      "error": "An error occurred. Please try again."
     }
   }
 }

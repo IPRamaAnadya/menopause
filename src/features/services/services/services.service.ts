@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { Service, CreateServiceDTO, UpdateServiceDTO, ServiceFilters, ServiceTranslation } from '../types';
-import { LocalImageService } from '@/features/image/image.service';
+import { ImageServiceFactory } from '@/features/image/image.service';
 
 export class ServicesService {
   /**
@@ -44,7 +44,7 @@ export class ServicesService {
     if (data.image && typeof data.image === 'object' && 'arrayBuffer' in data.image) {
       const buffer = Buffer.from(await data.image.arrayBuffer());
       const filename = `${Date.now()}_${data.image.name}`;
-      const imageService = new LocalImageService();
+      const imageService = ImageServiceFactory.getService();
       imageUrl = await imageService.upload(buffer, filename);
     }
     const service = await prisma.services.create({
@@ -82,13 +82,13 @@ export class ServicesService {
       const oldService = await prisma.services.findUnique({ where: { id } });
       if (oldService?.image_url) {
         const oldFilename = oldService.image_url.split('/').pop();
-        const imageService = new LocalImageService();
+        const imageService = ImageServiceFactory.getService();
         await imageService.delete(oldFilename!);
       }
       // Save new image
       const buffer = Buffer.from(await data.image.arrayBuffer());
       const filename = `${Date.now()}_${data.image.name}`;
-      const imageService = new LocalImageService();
+      const imageService = ImageServiceFactory.getService();
       imageUrl = await imageService.upload(buffer, filename);
     }
     const service = await prisma.services.update({

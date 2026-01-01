@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { LocalImageService } from '@/features/image/image.service';
+import { ImageServiceFactory } from '@/features/image/image.service';
 import { successResponse, ApiErrors } from '@/lib/api-response';
 
 export async function POST(req: NextRequest) {
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const filename = `${Date.now()}_${file.name}`;
-    const imageService = new LocalImageService();
+    const imageService = ImageServiceFactory.getService();
     const imageUrl = await imageService.upload(buffer, filename);
 
     return successResponse({ url: imageUrl });

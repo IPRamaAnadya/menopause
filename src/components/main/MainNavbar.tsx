@@ -28,7 +28,7 @@ export function MainNavbar() {
     { href: '/about', label: t('nav.about') },
     { href: '/service', label: t('nav.service') },
     { href: '/articles', label: t('nav.articles') },
-    { href: '/event', label: t('nav.event') },
+    { href: '/events', label: t('nav.event') },
     { href: '/contact', label: t('nav.contact') },
   ];
 

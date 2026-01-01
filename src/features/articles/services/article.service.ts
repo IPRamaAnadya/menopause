@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { Article, CreateArticleDTO, UpdateArticleDTO, ArticleFilters } from '../types';
-import { LocalImageService } from '@/features/image/image.service';
+import { ImageServiceFactory } from '@/features/image/image.service';
 
 export class ArticleService {
   /**
@@ -346,7 +346,7 @@ export class ArticleService {
     if (data.image && typeof data.image === 'object' && 'arrayBuffer' in data.image) {
       const buffer = Buffer.from(await data.image.arrayBuffer());
       const filename = `${Date.now()}_${data.image.name}`;
-      const imageService = new LocalImageService();
+      const imageService = ImageServiceFactory.getService();
       imageUrl = await imageService.upload(buffer, filename);
     }
 
@@ -415,13 +415,13 @@ export class ArticleService {
       const oldArticle = await prisma.articles.findUnique({ where: { id } });
       if (oldArticle?.image_url) {
         const oldFilename = oldArticle.image_url.split('/').pop();
-        const imageService = new LocalImageService();
+        const imageService = ImageServiceFactory.getService();
         await imageService.delete(oldFilename!);
       }
       // Upload new image
       const buffer = Buffer.from(await data.image.arrayBuffer());
       const filename = `${Date.now()}_${data.image.name}`;
-      const imageService = new LocalImageService();
+      const imageService = ImageServiceFactory.getService();
       imageUrl = await imageService.upload(buffer, filename);
     }
 
@@ -478,7 +478,7 @@ export class ArticleService {
     const article = await prisma.articles.findUnique({ where: { id } });
     if (article?.image_url) {
       const filename = article.image_url.split('/').pop();
-      const imageService = new LocalImageService();
+      const imageService = ImageServiceFactory.getService();
       await imageService.delete(filename!);
     }
 

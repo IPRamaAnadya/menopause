@@ -25,7 +25,7 @@ export default function CreateArticlePage() {
   const t = useTranslations('ArticlesManagement');
   const router = useRouter();
   const { categories } = useCategories();
-  const { membershipLevels } = useMembershipLevels();
+  const { levels } = useMembershipLevels();
   const { createArticle, loading } = useArticleActions();
 
   const [formData, setFormData] = useState<CreateArticleDTO>({
@@ -178,7 +178,7 @@ export default function CreateArticlePage() {
                       <SelectValue placeholder={t('form.selectMembershipLevel')} />
                     </SelectTrigger>
                     <SelectContent>
-                      {membershipLevels.map((level) => (
+                      {levels.map((level) => (
                         <SelectItem key={level.id} value={level.priority.toString()}>
                           {level.name} {level.priority === 1 ? t('form.allMembers') : `(${t('form.priorityLevel')} ${level.priority}+)`}
                         </SelectItem>

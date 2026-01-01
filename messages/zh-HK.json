@@ -33,7 +33,11 @@
       "memberSubscription": "會員訂閱",
       "articleManagement": "文章管理",
       "categoryManagement": "分類管理",
-      "articlesManagement": "文章管理"
+      "articlesManagement": "文章管理",
+      "eventManagement": "活動管理",
+      "eventsManagement": "活動管理",
+      "eventRegistrationsOverview": "報名總覽",
+      "eventRegistrationsHistory": "報名記錄"
     },
     "footer": {
       "version": "版本"
@@ -491,6 +495,118 @@
       "updating": "更新中..."
     }
   },
+  "EventsManagement": {
+    "title": "活動管理",
+    "subtitle": "管理所有活動",
+    "addButton": "新增活動",
+    "search": "搜尋活動...",
+    "allStatus": "所有狀態",
+    "noEvents": "找不到活動",
+    "getStarted": "開始建立您的第一個活動",
+    "capacity": "容量",
+    "status": {
+      "published": "已發佈",
+      "draft": "草稿",
+      "cancelled": "已取消"
+    },
+    "type": {
+      "online": "線上",
+      "offline": "線下",
+      "paid": "付費",
+      "free": "免費",
+      "highlighted": "精選"
+    },
+    "actions": {
+      "edit": "編輯",
+      "delete": "刪除",
+      "deleteConfirm": "您確定要刪除此活動嗎？",
+      "registrations": "報名列表"
+    },
+    "loading": "載入活動中...",
+    "showing": "顯示",
+    "of": "共",
+    "previous": "上一頁",
+    "next": "下一頁",
+    "filters": {
+      "time": "時間",
+      "allTime": "所有時間",
+      "upcoming": "即將舉行",
+      "ongoing": "進行中",
+      "passed": "已結束",
+      "location": "地點",
+      "allLocation": "所有地點",
+      "online": "線上",
+      "offline": "實體",
+      "visibility": "可見性",
+      "allVisibility": "全部",
+      "public": "公開",
+      "private": "私人",
+      "payment": "付款",
+      "allPayment": "全部",
+      "paid": "付費",
+      "free": "免費"
+    },
+    "form": {
+      "createTitle": "建立新活動",
+      "createDescription": "填寫詳細資料以建立新活動",
+      "editTitle": "編輯活動",
+      "editDescription": "在下方更新活動詳細資料",
+      "basicInfo": "基本資料",
+      "status": "狀態",
+      "capacity": "容量",
+      "capacityPlaceholder": "留空表示不限人數",
+      "imageUrl": "圖片網址",
+      "startDate": "開始日期",
+      "endDate": "結束日期",
+      "startTime": "開始時間",
+      "endTime": "結束時間",
+      "isOnline": "線上活動",
+      "isOnlineDescription": "此活動將在線上舉行",
+      "meetingUrl": "會議網址",
+      "isPaid": "付費活動",
+      "isPaidDescription": "此活動需要付費",
+      "isPublic": "公開活動",
+      "isPublicDescription": "任何人都可以查看並報名參加此活動",
+      "isHighlighted": "精選活動",
+      "isHighlightedDescription": "此活動將在主頁的精選區域中展示",
+      "englishContent": "英文內容",
+      "chineseContent": "中文內容",
+      "title": "標題",
+      "titlePlaceholder": "輸入活動標題",
+      "slug": "網址代碼",
+      "shortDescription": "簡短描述",
+      "shortDescriptionPlaceholder": "活動的簡要摘要",
+      "description": "完整描述",
+      "descriptionPlaceholder": "詳細的活動描述",
+      "placeName": "場地名稱",
+      "placeNamePlaceholder": "例如：香港會議展覽中心",
+      "placeDetails": "場地詳情",
+      "placeDetailsPlaceholder": "地址和路線指引",
+      "cancel": "取消",
+      "create": "建立活動",
+      "update": "更新活動",
+      "creating": "建立中...",
+      "updating": "更新中...",
+      "translations": "翻譯"
+    },
+    "registrations": {
+      "title": "活動報名",
+      "total": "總報名人數",
+      "paid": "已付款",
+      "pending": "待處理",
+      "attended": "已出席",
+      "noRegistrations": "尚無報名",
+      "noRegistrationsDescription": "當有人報名時，報名資料將顯示在這裡",
+      "name": "姓名",
+      "email": "電郵",
+      "price": "價格",
+      "status": "狀態",
+      "registeredAt": "報名時間",
+      "searchPlaceholder": "搜尋姓名或電郵...",
+      "filterByStatus": "按狀態篩選",
+      "allStatuses": "所有狀態"
+    }
+  },
   "MainSite": {
     "nav": {
       "home": "首頁",
@@ -584,6 +700,148 @@
         "link": "顯示所有活動"
       }
     },
+    "events": {
+      "page": {
+        "badge": "活動",
+        "heading": "瀏覽我們的活動",
+        "description": "參加我們的社區活動、工作坊和聚會，旨在教育、賦權和支持女性度過更年期。"
+      },
+      "searchPlaceholder": "搜尋活動...",
+      "filters": {
+        "time": "時間",
+        "allTime": "所有時間",
+        "upcoming": "即將舉行",
+        "ongoing": "進行中",
+        "passed": "已結束",
+        "location": "地點",
+        "allLocation": "所有地點",
+        "online": "線上",
+        "offline": "實體",
+        "payment": "付款",
+        "allPayment": "全部",
+        "paid": "付費",
+        "free": "免費"
+      },
+      "readMore": "查看詳情",
+      "capacity": "容量",
+      "pricingWithMembership": "會員價格不同",
+      "pricingPublic": "公開價格",
+      "noEvents": "找不到活動",
+      "noEventsDescription": "請稍後再查看即將舉行的活動。",
+      "noSearchResults": "找不到符合您搜尋的活動。",
+      "searchSuggestion": "請嘗試調整篩選條件或搜尋關鍵字。",
+      "backToEvents": "返回活動列表",
+      "notFound": "找不到活動",
+      "errorLoading": "載入活動時發生錯誤",
+      "to": "至",
+      "location": {
+        "onlineEvent": "線上活動",
+        "joinMeeting": "加入會議"
+      },
+      "about": "關於此活動",
+      "register": "立即報名",
+      "share": "分享",
+      "featured": "精選",
+      "badges": {
+        "online": "線上",
+        "inPerson": "實體",
+        "paid": "付費",
+        "free": "免費",
+        "public": "公開",
+        "membersOnly": "僅限會員"
+      },
+      "details": {
+        "dateTime": "日期和時間",
+        "duration": "時長",
+        "location": "地點",
+        "venue": "場地",
+        "capacity": "容量",
+        "participants": "人",
+        "addToCalendar": "加入日曆"
+      },
+      "pricing": {
+        "free": "免費活動",
+        "freeDescription": "無需註冊費用",
+        "public": "公開價格（非會員）",
+        "publicDescription": "非會員價格",
+        "yourPrice": "您的會員價格",
+        "cheaperPrices": "更優惠的會員選項",
+        "quota": "名額"
+      },
+      "registration": {
+        "title": "報名",
+        "loginRequired": "需要登入才能報名",
+        "upgradeMembership": "升級會籍",
+        "joinMembership": "加入會籍",
+        "backToEvent": "返回活動",
+        "eventSummary": "活動摘要",
+        "yourPrice": "您的價格",
+        "loggedInDescription": "完成此活動的報名",
+        "guestDescription": "作為訪客報名或登入以獲取會員優惠",
+        "registeringAs": "註冊為",
+        "membershipActive": "活躍會籍",
+        "guestInfo": "您正以訪客身份報名。想要會員優惠嗎？",
+        "login": "登入",
+        "form": {
+          "fullName": "全名",
+          "fullNamePlaceholder": "輸入您的全名",
+          "name": "姓名",
+          "email": "電郵",
+          "emailPlaceholder": "your.email@example.com",
+          "phone": "電話號碼",
+          "phonePlaceholder": "+852 1234 5678"
+        },
+        "proceedToPayment": "前往付款",
+        "confirmRegistration": "確認報名",
+        "agreement": "註冊即表示您同意我們的條款和細則",
+        "errorTitle": "報名錯誤",
+        "notFound": "未找到報名記錄",
+        "alreadyRegistered": "您已經報名此活動。請檢查您的電郵以獲取確認詳情。",
+        "success": {
+          "title": "報名確認！",
+          "description": "您已成功報名此活動",
+          "details": "報名詳情",
+          "confirmationNumber": "確認編號",
+          "scanQR": "掃描以快速訪問",
+          "registrantInfo": "報名者資訊",
+          "orderDetails": "訂單詳情",
+          "registrationStatus": "報名狀態",
+          "orderNumber": "訂單編號",
+          "orderStatus": "付款狀態",
+          "paymentMethod": "付款方式",
+          "amount": "金額",
+          "paidAt": "付款日期",
+          "payment": "付款",
+          "amountPaid": "已付金額",
+          "nextSteps": "接下來做什麼？",
+          "emailSent": "確認電郵已發送至您的電郵地址，包含活動詳情",
+          "addCalendar": "將此活動加入您的日曆，以免錯過",
+          "onlineLink": "對於線上活動，您將在活動前通過電郵收到會議連結",
+          "viewEvent": "查看活動詳情",
+          "browseEvents": "瀏覽更多活動"
+        }
+      },
+      "organizer": {
+        "title": "主辦方",
+        "description": "由我們的團隊組織的活動"
+      },
+      "eventInfo": {
+        "title": "活動資訊",
+        "eventId": "活動編號",
+        "status": "狀態",
+        "featured": "精選活動"
+      },
+      "map": {
+        "title": "地點地圖",
+        "getDirections": "獲取路線",
+        "openInMaps": "在地圖中打開"
+      },
+      "errorTitle": "無法載入活動",
+      "showing": "顯示",
+      "of": "共",
+      "previous": "上一頁",
+      "next": "下一頁"
+    },
     "testimonial": {
       "badge": "她們的分享",
       "title": "來自我們的社區",
@@ -604,6 +862,11 @@
       "badge": "精選內容",
       "title": "精選文章",
       "subtitle": "探索我們由專家精選的最重要文章，為您的更年期旅程提供指引。"
+    },
+    "highlightedEvents": {
+      "badge": "精選活動",
+      "title": "即將舉行的精選活動",
+      "subtitle": "別錯過我們精心策劃的活動，旨在教育和支持您的更年期旅程。"
     },    "articles": {
       "badge": "精選文章",
       "title": "關於更年期的所有文章",
@@ -778,7 +1041,8 @@
         "UPDATED": "已更新",
         "CANCELLED": "已取消",
         "EXPIRED": "已到期",
-        "RENEWED": "已續訂"
+        "RENEWED": "已續訂",
+        "DOWNGRADED": "已降級"
       }
     },
     "table": {
@@ -935,6 +1199,77 @@
       "languageInfo": "使用導覽列中的語言切換器來變更語言"
     }
   },
+  "EventRegistrationsOverview": {
+    "title": "活動報名總覽",
+    "subtitle": "查看所有活動報名的統計數據和見解",
+    "statistics": {
+      "totalRegistrations": "總報名人數",
+      "paidRegistrations": "已付款",
+      "pendingRegistrations": "待處理",
+      "cancelledRegistrations": "已取消",
+      "attendedRegistrations": "已出席",
+      "totalRevenue": "總收入"
+    },
+    "topEvents": {
+      "title": "報名人數最多的活動",
+      "eventName": "活動名稱",
+      "registrations": "報名人數",
+      "noData": "沒有活動數據"
+    },
+    "recentRegistrations": {
+      "title": "最近報名記錄",
+      "attendee": "參加者",
+      "event": "活動",
+      "price": "價格",
+      "status": "狀態",
+      "registeredAt": "報名時間",
+      "noData": "沒有最近的報名記錄"
+    },
+    "status": {
+      "PENDING": "待處理",
+      "PAID": "已付款",
+      "CANCELLED": "已取消",
+      "ATTENDED": "已出席"
+    },
+    "viewAll": "查看所有報名記錄"
+  },
+  "EventRegistrationsHistory": {
+    "title": "活動報名記錄",
+    "subtitle": "查看和管理所有活動報名",
+    "search": "按姓名或電郵搜尋...",
+    "filters": {
+      "allStatus": "所有狀態",
+      "allEvents": "所有活動"
+    },
+    "table": {
+      "attendee": "參加者",
+      "event": "活動",
+      "membershipLevel": "會籍等級",
+      "price": "價格",
+      "status": "狀態",
+      "registeredAt": "報名時間",
+      "actions": "操作"
+    },
+    "status": {
+      "PENDING": "待處理",
+      "PAID": "已付款",
+      "CANCELLED": "已取消",
+      "ATTENDED": "已出席"
+    },
+    "membershipLevel": {
+      "public": "公開",
+      "none": "無"
+    },
+    "pagination": {
+      "showing": "顯示第 {from}-{to} 項，共 {total} 個報名記錄",
+      "previous": "上一頁",
+      "next": "下一頁"
+    },
+    "noRegistrations": "找不到報名記錄",
+    "getStarted": "活動報名記錄將顯示在這裡",
+    "loading": "載入報名記錄中...",
+    "guest": "訪客"
+  },
   "Admin": {
     "memberships": {
       "overview": "會籍總覽",
@@ -954,6 +1289,45 @@
       "showing": "顯示第 {from} 至 {to} 項，共 {total} 位會員",
       "previous": "上一頁",
       "next": "下一頁"
+    }
+  },
+  "Common": {
+    "loading": "載入中...",
+    "saving": "儲存中...",
+    "submit": "提交",
+    "cancel": "取消",
+    "delete": "刪除",
+    "edit": "編輯",
+    "save": "儲存",
+    "back": "返回",
+    "next": "下一頁",
+    "previous": "上一頁",
+    "search": "搜尋",
+    "filter": "篩選",
+    "sort": "排序",
+    "actions": "操作",
+    "status": "狀態",
+    "date": "日期",
+    "time": "時間",
+    "location": "地點",
+    "description": "描述",
+    "title": "標題",
+    "name": "名稱",
+    "email": "電郵",
+    "phone": "電話",
+    "address": "地址",
+    "city": "城市",
+    "country": "國家",
+    "zipCode": "郵遞區號",
+    "form": {
+      "required": "此欄位為必填",
+      "invalidEmail": "請輸入有效的電郵地址",
+      "invalidPhone": "請輸入有效的電話號碼",
+      "invalidUrl": "請輸入有效的網址",
+      "minLength": "最少需要 {min} 個字符",
+      "maxLength": "最多不能超過 {max} 個字符",
+      "passwordMismatch": "密碼不匹配",
+      "error": "發生錯誤，請重試"
     }
   }
 }

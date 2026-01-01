@@ -200,6 +200,7 @@ export async function POST(request: NextRequest) {
         },
       },
       metadata: {
+        transaction_type: 'membership',
         order_id: orderResult.order.id.toString(),
         payment_public_id: orderResult.payment.publicId,
         user_id: session.user.id,

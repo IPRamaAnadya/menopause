@@ -159,10 +159,6 @@ export class OrderService {
     // Verify and parse webhook
     const { event, data } = await paymentProvider.processWebhook(payload, signature);
 
-    // Handle based on event type
-    console.log(`[processWebhook] Event type: ${event}`);
-    console.log('[processWebhook] Event data keys:', Object.keys(data));
-
     
     if (event.includes('checkout.session.completed')) {
       console.log('[processWebhook] Handling checkout.session.completed');
@@ -192,6 +188,12 @@ export class OrderService {
     const metadata = data.metadata || {};
     const paymentPublicId = metadata.payment_public_id;
     
+    // Check if this is a guest event registration (no order_id)
+    if (metadata.registration_public_id && metadata.user_id === 'guest' && !metadata.order_id) {
+      console.log('[handleCheckoutSessionCompleted] Processing guest event registration');
+      return this.handleGuestEventRegistration(data, metadata);
+    }
+    
     let payment;
     
     if (paymentPublicId) {
@@ -211,11 +213,9 @@ export class OrderService {
         return { success: true, message: 'No payment intent found' };
       }
 
-      console.log(`Looking for payment with providerRef: ${paymentIntentId}`);
       payment = await paymentRepository.findByProviderRef(paymentIntentId);
       
       if (!payment) {
-        console.log('Payment not found with providerRef:', paymentIntentId);
         return { success: true, message: 'Payment not tracked in system' };
       }
     }
@@ -257,11 +257,21 @@ export class OrderService {
       new Date()
     );
 
-    // Get order details to check if this is a membership order
+    // Check checkout session metadata first for event registration
+    const checkoutMetadata = data.metadata || {};
+    if (checkoutMetadata.registration_id && checkoutMetadata.event_id) {
+      console.log('[handleCheckoutSessionCompleted] Processing member event registration from checkout metadata');
+      await this.processEventRegistration(parseInt(checkoutMetadata.registration_id));
+      console.log('[handleCheckoutSessionCompleted] ✓ Event registration processed');
+      return { success: true, orderId: payment.order_id };
+    }
+
+    // Get order details to check if this is a membership or event order
     const order = await orderRepository.findById(payment.order_id);
     console.log('[handleCheckoutSessionCompleted] Order details:', {
       orderId: order?.id,
       userId: order?.userId,
+      type: order?.type,
       metadata: order?.metadata
     });
     
@@ -271,8 +281,11 @@ export class OrderService {
       console.log('[handleCheckoutSessionCompleted] Checking metadata:', {
         membership_level_id: metadata.membership_level_id,
         operation_type: metadata.operation_type,
+        registration_id: metadata.registration_id,
+        event_id: metadata.event_id,
         hasLevel: !!metadata.membership_level_id,
-        hasOperation: !!metadata.operation_type
+        hasOperation: !!metadata.operation_type,
+        hasRegistration: !!metadata.registration_id
       });
       
       // Process membership changes
@@ -284,14 +297,76 @@ export class OrderService {
           metadata.operation_type
         );
         console.log('[handleCheckoutSessionCompleted] ✓ Membership change processed');
-      } else {
-        console.log('[handleCheckoutSessionCompleted] No membership metadata found - skipping membership processing');
+      } 
+      // Process event registration
+      else if (metadata.registration_id) {
+        console.log('[handleCheckoutSessionCompleted] Processing event registration from order metadata...');
+        await this.processEventRegistration(parseInt(metadata.registration_id));
+        console.log('[handleCheckoutSessionCompleted] ✓ Event registration processed');
+      } 
+      else {
+        console.log('[handleCheckoutSessionCompleted] No specific metadata found - generic payment processed');
       }
     } else {
       console.log('[handleCheckoutSessionCompleted] No order or metadata found');
     }
     
     return { success: true, orderId: payment.order_id };
+  }
+
+  /**
+   * Handle guest event registration payment (no order record)
+   */
+  private async handleGuestEventRegistration(data: any, metadata: any) {
+    console.log('[handleGuestEventRegistration] Processing guest registration:', {
+      registration_id: metadata.registration_id,
+      registration_public_id: metadata.registration_public_id,
+      event_id: metadata.event_id,
+      guest_email: metadata.guest_email,
+      guest_name: metadata.guest_name,
+    });
+
+    try {
+      const registrationId = parseInt(metadata.registration_id);
+      if (!registrationId || isNaN(registrationId)) {
+        throw new Error('Invalid registration_id in metadata');
+      }
+
+      // Process the event registration
+      await this.processEventRegistration(registrationId);
+
+      console.log('[handleGuestEventRegistration] ✓ Guest event registration processed successfully');
+      return { 
+        success: true, 
+        message: 'Guest event registration processed',
+        registrationId 
+      };
+    } catch (error) {
+      console.error('[handleGuestEventRegistration] ERROR:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Process event registration after successful payment
+   */
+  private async processEventRegistration(registrationId: number) {
+    const EventRegistrationService = (await import('@/features/event/services/event-registration.service')).EventRegistrationService;
+
+    console.log(`[processEventRegistration] Starting for registration ${registrationId}`);
+
+    try {
+      await EventRegistrationService.processEventPayment(registrationId);
+      console.log(`[processEventRegistration] ✓ Processed event registration ${registrationId}`);
+    } catch (error) {
+      console.error(`[processEventRegistration] ERROR processing event registration:`, error);
+      console.error(`[processEventRegistration] Error details:`, {
+        registrationId,
+        errorMessage: error instanceof Error ? error.message : String(error),
+        errorStack: error instanceof Error ? error.stack : undefined
+      });
+      // Don't throw - we already marked payment as succeeded
+    }
   }
 
   /**

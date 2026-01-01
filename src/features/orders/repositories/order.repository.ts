@@ -50,19 +50,13 @@ export class OrderRepository {
     const date = new Date();
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
     
-    // Get count of orders today
-    const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    const count = await prisma.orders.count({
-      where: {
-        created_at: {
-          gte: startOfDay,
-        },
-      },
-    });
+    // Use timestamp + random to ensure uniqueness
+    const timestamp = Date.now().toString().slice(-6); // Last 6 digits of timestamp
+    const random = Math.random().toString(36).substring(2, 6).toUpperCase(); // 4 random chars
     
-    const sequence = String(count + 1).padStart(4, '0');
-    return `ORD-${year}${month}-${sequence}`;
+    return `ORD-${year}${month}${day}-${timestamp}${random}`;
   }
 
   /**

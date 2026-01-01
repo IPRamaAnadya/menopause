@@ -33,7 +33,7 @@ export function HeroSection() {
           {/* Right Image */}
           <div className="relative h-100 lg:h-150">
             <Image
-              src="/assets/images/hero.jpg"
+              src="/assets/images/hero.avif"
               alt="Hero Image"
               fill
               className="object-cover"

@@ -1,8 +1,11 @@
 import { NextRequest } from 'next/server';
 import { headers } from 'next/headers';
-import { orderService } from '@/features/orders';
+import { orderWebhookService } from '@/features/orders/services/order.webhook.service';
 import { PaymentProvider } from '@/generated/prisma';
 import { successResponse, ApiErrors } from '@/lib/api-response';
+
+// Disable body parsing to get raw body for Stripe signature verification
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,7 +18,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Process webhook
-    const result = await orderService.processWebhook(
+    const result = await orderWebhookService.processWebhook(
       PaymentProvider.STRIPE,
       body,
       signature

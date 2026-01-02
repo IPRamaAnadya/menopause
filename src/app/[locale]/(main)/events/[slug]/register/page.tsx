@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useToast } from '@/hooks/use-toast';
 import { 
   ArrowLeft, 
   Calendar, 
@@ -28,6 +29,7 @@ export default function EventRegisterPage({ params }: { params: Promise<{ slug: 
   const router = useRouter();
   const { data: session, status: sessionStatus } = useSession();
   const { membershipLevels, loading: levelsLoading } = usePublicMembershipLevels();
+  const { toast } = useToast();
   
   const [event, setEvent] = useState<EventWithTranslations | null>(null);
   const [loading, setLoading] = useState(true);
@@ -285,7 +287,12 @@ export default function EventRegisterPage({ params }: { params: Promise<{ slug: 
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred';
+      toast({
+        title: tCommon('toast.error'),
+        description: errorMessage,
+        variant: 'destructive',
+      });
       setSubmitting(false);
     }
   };
@@ -411,60 +418,51 @@ export default function EventRegisterPage({ params }: { params: Promise<{ slug: 
         )}
 
         {/* Registration Form */}
-        <div className="w-full max-w-2xl mx-auto">
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('registration.title')}</h2>
-            <p className="text-gray-600 mb-8">{t('registration.subtitle')}</p>
+        <div className="w-full mx-auto">
+          <div className="bg-white  ">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-900">{t('registration.title')}</h2>
+              <p className="text-gray-500 mt-1">{t('registration.subtitle')}</p>
+            </div>
           
             <form onSubmit={handleSubmit} className="space-y-6">
               {session ? (
                 /* Logged in user info */
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900 mb-1">
-                        {t('registration.registeringAs')}
-                      </p>
-                      <p className="text-base font-semibold text-gray-900">
-                        {session.user?.name || session.user?.email}
-                      </p>
-                      {userMembershipLevelId && (
-                        <div className="mt-3 pt-3 border-t border-blue-200">
-                          <p className="text-xs text-gray-600 mb-1">
+                <div className="bg-gray-50 rounded-2xl p-5">
+                  <div className="space-y-3">
+                    <p className="text-xs uppercase tracking-wide font-medium text-gray-500">
+                      {t('registration.registeringAs')}
+                    </p>
+                    <p className="text-lg font-semibold text-gray-900">
+                      {session.user?.name || session.user?.email}
+                    </p>
+                    {userMembershipLevelId && (
+                      <>
+                        <div className="h-px bg-gray-200" />
+                        <div>
+                          <p className="text-xs text-gray-500 mb-1">
                             {t('registration.membershipActive')}
                           </p>
-                          <p className="text-sm font-semibold text-blue-700">
+                          <p className="text-sm font-medium text-gray-900">
                             {getMembershipLevelName(userMembershipLevelId)}
                           </p>
                         </div>
-                      )}
-                    </div>
+                      </>
+                    )}
                   </div>
                 </div>
               ) : (
                 /* Guest registration form */
                 <div className="space-y-6">
-                  <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-5">
-                    <div className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <div className="flex-1">
-                        <p className="text-sm text-gray-700 leading-relaxed">
-                          {t('registration.guestInfo')} <Link href="/auth/signin" className="text-primary font-semibold underline hover:no-underline">{t('registration.login')}</Link>
-                        </p>
-                      </div>
-                    </div>
+                  <div className="bg-amber-50 rounded-2xl p-4 border-l-4 border-amber-400">
+                    <p className="text-sm text-gray-700">
+                      {t('registration.guestInfo')} <Link href="/auth/signin" className="text-primary font-medium hover:underline">{t('registration.login')}</Link>
+                    </p>
                   </div>
 
                   <div className="space-y-5">
                     <div>
-                      <Label htmlFor="fullName" className="text-sm font-medium text-gray-900">
+                      <Label htmlFor="fullName" className="text-sm font-medium text-gray-700">
                         {t('registration.form.fullName')} <span className="text-red-500">*</span>
                       </Label>
                       <Input
@@ -472,21 +470,18 @@ export default function EventRegisterPage({ params }: { params: Promise<{ slug: 
                         value={guestForm.fullName}
                         onChange={(e) => setGuestForm({ ...guestForm, fullName: e.target.value })}
                         placeholder={t('registration.form.fullNamePlaceholder')}
-                        className="mt-2 h-12 text-base"
+                        className="mt-1.5 h-11"
                         disabled={submitting}
                       />
                       {formErrors.fullName && (
-                        <p className="text-sm text-red-600 mt-1.5 flex items-center gap-1">
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                          </svg>
+                        <p className="text-xs text-red-600 mt-1.5">
                           {formErrors.fullName}
                         </p>
                       )}
                     </div>
 
                     <div>
-                      <Label htmlFor="email" className="text-sm font-medium text-gray-900">
+                      <Label htmlFor="email" className="text-sm font-medium text-gray-700">
                         {t('registration.form.email')} <span className="text-red-500">*</span>
                       </Label>
                       <Input
@@ -495,21 +490,18 @@ export default function EventRegisterPage({ params }: { params: Promise<{ slug: 
                         value={guestForm.email}
                         onChange={(e) => setGuestForm({ ...guestForm, email: e.target.value })}
                         placeholder={t('registration.form.emailPlaceholder')}
-                        className="mt-2 h-12 text-base"
+                        className="mt-1.5 h-11"
                         disabled={submitting}
                       />
                       {formErrors.email && (
-                        <p className="text-sm text-red-600 mt-1.5 flex items-center gap-1">
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                          </svg>
+                        <p className="text-xs text-red-600 mt-1.5">
                           {formErrors.email}
                         </p>
                       )}
                     </div>
 
                     <div>
-                      <Label htmlFor="phone" className="text-sm font-medium text-gray-900">
+                      <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
                         {t('registration.form.phone')} <span className="text-red-500">*</span>
                       </Label>
                       <Input
@@ -518,14 +510,11 @@ export default function EventRegisterPage({ params }: { params: Promise<{ slug: 
                         value={guestForm.phone}
                         onChange={(e) => setGuestForm({ ...guestForm, phone: e.target.value })}
                         placeholder={t('registration.form.phonePlaceholder')}
-                        className="mt-2 h-12 text-base"
+                        className="mt-1.5 h-11"
                         disabled={submitting}
                       />
                       {formErrors.phone && (
-                        <p className="text-sm text-red-600 mt-1.5 flex items-center gap-1">
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                          </svg>
+                        <p className="text-xs text-red-600 mt-1.5">
                           {formErrors.phone}
                         </p>
                       )}
@@ -534,52 +523,25 @@ export default function EventRegisterPage({ params }: { params: Promise<{ slug: 
                 </div>
               )}
 
-              {error && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                  <div className="flex items-start gap-3">
-                    <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                    </svg>
-                    <p className="text-sm text-red-700 flex-1">{error}</p>
-                  </div>
-                </div>
-              )}
-
               {/* Submit Button */}
-              <div className="pt-2">
+              <div className="pt-4">
                 <Button 
                   type="submit" 
                   size="lg" 
-                  className="w-full h-14 text-base font-semibold"
+                  className="w-full h-12"
                   disabled={submitting}
                 >
                   {submitting ? (
-                    <div className="flex items-center gap-2">
-                      <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      {tCommon('loading')}
-                    </div>
+                    tCommon('loading')
                   ) : event.is_paid && userPrice && (userPrice.price ?? 0) > 0 ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                      </svg>
-                      {t('registration.proceedToPayment')}
-                    </div>
+                    t('registration.proceedToPayment')
                   ) : (
-                    <div className="flex items-center justify-center gap-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      {t('registration.confirmRegistration')}
-                    </div>
+                    t('registration.confirmRegistration')
                   )}
                 </Button>
 
                 {!session && (
-                  <p className="text-xs text-center text-gray-500 mt-4 leading-relaxed">
+                  <p className="text-xs text-center text-gray-500 mt-4">
                     {t('registration.agreement')}
                   </p>
                 )}

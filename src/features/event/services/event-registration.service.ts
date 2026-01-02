@@ -148,6 +148,17 @@ export class EventRegistrationService {
   }
 
   /**
+   * Get registrations by user
+   */
+  static async getUserRegistrations(
+    userId: number,
+    locale?: string
+  ): Promise<EventRegistration[]> {
+    const registrations = await eventRegistrationRepository.findByUserId(userId);
+    return registrations.map(reg => this.transformRegistration(reg, locale));
+  }
+
+  /**
    * Get registration by ID
    */
   static async getRegistrationById(id: number, locale?: string): Promise<EventRegistration | null> {

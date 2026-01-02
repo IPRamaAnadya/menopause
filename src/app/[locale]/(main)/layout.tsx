@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { MainNavbar } from '@/components/main/MainNavbar';
 import { Footer } from '@/components/main/Footer';
+import { Toaster } from '@/components/ui/toaster';
 
 export default async function MainLayout({
   children,
@@ -12,6 +13,7 @@ export default async function MainLayout({
       <MainNavbar />
       <main>{children}</main>
       <Footer />
+      <Toaster />
     </>
   );
 }

@@ -8,6 +8,7 @@ declare module 'next-auth' {
       provider?: string;
       role?: string;
       isResetPassword?: boolean;
+      emailVerified?: Date | null;
     } & DefaultSession['user'];
   }
 
@@ -22,5 +23,6 @@ declare module 'next-auth/jwt' {
     provider?: string;
     role?: string;
     isResetPassword?: boolean;
+    emailVerified?: Date | null;
   }
 }

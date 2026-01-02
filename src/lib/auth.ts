@@ -58,6 +58,21 @@ export const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
+    async signIn({ user, account, profile }) {
+      // Allow sign in
+      return true;
+    },
+
+    async redirect({ url, baseUrl }) {
+      // Handle redirects after sign in
+      // If URL is already provided, use it
+      if (url.startsWith(baseUrl)) return url;
+      if (url.startsWith('/')) return `${baseUrl}${url}`;
+      
+      // Default redirect based on user role - this will be set in session callback
+      return baseUrl;
+    },
+
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.sub!;
@@ -66,11 +81,12 @@ export const authOptions: NextAuthOptions = {
         session.user.image = token.picture;
         session.user.role = token.role as string;
         session.user.isResetPassword = token.isResetPassword as boolean;
+        session.user.emailVerified = token.emailVerified as Date | null;
       }
       return session;
     },
 
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger }) {
       if (user) {
         token.id = user.id;
         
@@ -88,6 +104,23 @@ export const authOptions: NextAuthOptions = {
 
         if (dbUser) {
           token.role = dbUser.user_roles[0]?.roles.name || 'Member';
+          token.isResetPassword = dbUser.is_reset_password;
+          token.emailVerified = dbUser.email_verified;
+        }
+      }
+      
+      // Refresh user data when session is updated (e.g., after email verification)
+      if (trigger === 'update' && token.sub) {
+        const dbUser = await prisma.users.findUnique({
+          where: { id: parseInt(token.sub) },
+          select: {
+            email_verified: true,
+            is_reset_password: true,
+          },
+        });
+        
+        if (dbUser) {
+          token.emailVerified = dbUser.email_verified;
           token.isResetPassword = dbUser.is_reset_password;
         }
       }

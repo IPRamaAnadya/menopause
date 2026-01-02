@@ -770,6 +770,7 @@
       },
       "registration": {
         "title": "報名",
+        "subtitle": "完成此活動的報名",
         "loginRequired": "需要登入才能報名",
         "upgradeMembership": "升級會籍",
         "joinMembership": "加入會籍",
@@ -797,6 +798,7 @@
         "errorTitle": "報名錯誤",
         "notFound": "未找到報名記錄",
         "alreadyRegistered": "您已經報名此活動。請檢查您的電郵以獲取確認詳情。",
+        "alreadyRegisteredMember": "您已經報名此活動。請前往您的個人資料 → 我的活動門票查看確認詳情。",
         "success": {
           "title": "報名確認！",
           "description": "您已成功報名此活動",
@@ -1294,6 +1296,7 @@
   "Common": {
     "loading": "載入中...",
     "saving": "儲存中...",
+    "uploading": "上傳中...",
     "submit": "提交",
     "cancel": "取消",
     "delete": "刪除",
@@ -1328,6 +1331,146 @@
       "maxLength": "最多不能超過 {max} 個字符",
       "passwordMismatch": "密碼不匹配",
       "error": "發生錯誤，請重試"
+    },
+    "toast": {
+      "error": "錯誤",
+      "success": "成功",
+      "warning": "警告",
+      "info": "資訊"
+    }
+  },
+  "Lounge": {
+    "welcome": "歡迎來到會員專區",
+    "nav": {
+      "lounge": "會員專區",
+      "articles": "文章",
+      "events": "活動",
+      "community": "社群",
+      "home": "主頁",
+      "logout": "登出"
+    },
+    "hero": {
+      "membersOnly": "會員專屬",
+      "welcomeMessage": "歡迎來到會員專區",
+      "welcomeTitle": "歡迎來到會員專區，{userName}",
+      "description": "您的專屬空間，提供優質內容、社群連結和個人化健康資源。",
+      "upcomingEvent": "即將舉行的活動",
+      "featuredArticle": "精選文章",
+      "viewEvent": "查看活動",
+      "readArticle": "閱讀文章",
+      "loadingContent": "載入精選內容中..."
+    },
+    "articles": {
+      "title": "會員專屬文章",
+      "description": "為我們的會員精心策劃的優質內容",
+      "viewAll": "查看全部",
+      "readMore": "閱讀更多",
+      "swipeToSeeMore": "← 滑動查看更多 →",
+      "pageTitle": "文章與資源",
+      "pageDescription": "訪問為我們尊貴會員精心策劃的獨家文章、研究和見解。",
+      "allCategories": "所有類別",
+      "searchPlaceholder": "搜尋文章...",
+      "noArticles": "找不到文章",
+      "noArticlesDescription": "請嘗試調整您的搜尋條件或篩選器。"
+    },
+    "events": {
+      "title": "即將舉行的活動",
+      "description": "為我們社群提供的專屬活動和工作坊",
+      "viewAll": "查看全部",
+      "registerNow": "立即報名",
+      "spotsLeft": "個名額",
+      "swipeToSeeMore": "← 滑動查看更多 →"
+    },
+    "footer": {
+      "cta": {
+        "title": "需要協助？",
+        "description": "我們的團隊隨時為您提供協助，讓您充分享受會員權益。歡迎聯絡我們或管理您的帳戶。",
+        "contactButton": "聯絡我們",
+        "profileButton": "我的檔案"
+      },
+      "member": {
+        "title": "會員專區",
+        "lounge": "會員專區",
+        "articles": "文章",
+        "events": "活動",
+        "community": "社群"
+      },
+      "support": {
+        "title": "支援",
+        "faq": "常見問題",
+        "contact": "聯絡我們",
+        "profile": "我的檔案"
+      },
+      "resource": {
+        "title": "資源",
+        "about": "關於我們",
+        "services": "服務",
+        "privacy": "私隱政策",
+        "terms": "服務條款"
+      },
+      "copyright": "© 2025 香港更年期學會。保留所有權利。"
+    },
+    "comingSoon": {
+      "title": "即將推出",
+      "subtitle": "我們正在打造精彩功能",
+      "description": "我們的社群功能目前正在開發中。很快您就能與其他會員建立聯繫、分享經驗，並在健康旅程中互相支持。",
+      "notify": "準備就緒時通知我",
+      "backToLounge": "返回會員專區"
+    },
+    "profile": {
+      "changeProfileSettings": "修改個人資料設定",
+      "eventTickets": "活動門票",
+      "orderHistory": "訂單記錄",
+      "notifications": "通知",
+      "contactUs": "聯絡我們",
+      "settings": "設定",
+      "logout": "登出",
+      "noMembership": "無有有效會籍",
+      "settingsDescription": "更新您的個人資料和私隱設定",
+      "profilePhoto": "個人頭像",
+      "changePhoto": "更改照片",
+      "photoHint": "支援 JPG、PNG 或 GIF。最大檔案大小 5MB。",
+      "name": "姓名",
+      "namePlaceholder": "請輸入您的姓名",
+      "profession": "職業",
+      "professionPlaceholder": "請輸入您的職業",
+      "professionHint": "選填。這將顯示在您的個人資料上。",
+      "emailCannotChange": "電郵地址無法更改",
+      "hideProfile": "在評論和活動中隱藏我的個人資料",
+      "hideProfileDescription": "啟用後，當您發表評論或參與活動時，您的姓名將被隱藏以保護私隱。",
+      "saveChanges": "儲存變更",
+      "settingsUpdated": "個人資料設定已成功更新",
+      "settingsUpdateFailed": "更新個人資料設定失敗",
+      "invalidImageType": "無效的檔案類型。僅允許圖片。",
+      "imageTooLarge": "檔案過大。最大檔案大小為 5MB。",
+      "photoUpdated": "個人頭像已成功更新",
+      "photoUpdateFailed": "更新個人頭像失敗",
+      "privacy": {
+        "title": "私隱與安全",
+        "description": "管理您的電郵驗證和密碼設定",
+        "emailVerification": "電郵驗證",
+        "emailVerificationDescription": "驗證您的電郵地址以保護您的帳戶並接收重要通知",
+        "verified": "已驗證",
+        "notVerified": "未驗證",
+        "sendVerification": "發送驗證電郵",
+        "verificationSent": "驗證電郵已發送！請檢查您的收件箱",
+        "verificationFailed": "發送驗證電郵失敗",
+        "changePassword": "更改密碼",
+        "changePasswordDescription": "更新您的密碼以保護帳戶安全",
+        "currentPassword": "目前密碼",
+        "currentPasswordPlaceholder": "輸入您的目前密碼",
+        "newPassword": "新密碼",
+        "newPasswordPlaceholder": "輸入您的新密碼",
+        "confirmPassword": "確認新密碼",
+        "confirmPasswordPlaceholder": "確認您的新密碼",
+        "passwordHint": "密碼至少需要 8 個字符",
+        "updatePassword": "更新密碼",
+        "passwordChanged": "密碼已成功更改",
+        "passwordChangeFailed": "更改密碼失敗",
+        "passwordMismatch": "密碼不匹配",
+        "passwordTooShort": "密碼至少需要 8 個字符",
+        "fillAllFields": "請填寫所有欄位"
+      }
     }
   }
 }

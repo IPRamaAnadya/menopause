@@ -10,6 +10,7 @@ export async function middleware(request: NextRequest) {
   
   // Check if the route is a dashboard route
   const isDashboardRoute = pathname.includes('/dashboard');
+  const isMemberRoute = pathname.includes('/member');
   
   if (isDashboardRoute) {
     const token = await getToken({ 
@@ -25,12 +26,34 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(signInUrl);
     }
     
-    // If not admin, redirect to main page with error
+    // If not admin, redirect to member lounge
     if (token.role !== 'Administrator') {
       const locale = pathname.split('/')[1];
-      const mainUrl = new URL(`/${locale}`, request.url);
-      mainUrl.searchParams.set('error', 'unauthorized');
-      return NextResponse.redirect(mainUrl);
+      const loungeUrl = new URL(`/${locale}/member/lounge`, request.url);
+      return NextResponse.redirect(loungeUrl);
+    }
+  }
+
+  // Check if accessing member routes
+  if (isMemberRoute && !isDashboardRoute) {
+    const token = await getToken({ 
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET 
+    });
+    
+    // If not logged in, redirect to signin
+    if (!token) {
+      const locale = pathname.split('/')[1];
+      const signInUrl = new URL(`/${locale}/auth/signin`, request.url);
+      signInUrl.searchParams.set('callbackUrl', pathname);
+      return NextResponse.redirect(signInUrl);
+    }
+
+    // If admin tries to access member area, redirect to dashboard
+    if (token.role === 'Administrator' && pathname.includes('/member/lounge')) {
+      const locale = pathname.split('/')[1];
+      const dashboardUrl = new URL(`/${locale}/dashboard`, request.url);
+      return NextResponse.redirect(dashboardUrl);
     }
   }
   

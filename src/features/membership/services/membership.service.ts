@@ -160,6 +160,46 @@ export class MembershipService {
   }
 
   /**
+   * Get current user's active membership
+   */
+  static async getCurrentUserMembership(userId: number) {
+    const membership = await prisma.memberships.findFirst({
+      where: {
+        user_id: userId,
+        status: {
+          in: [PrismaMembershipStatus.ACTIVE],
+        },
+      },
+      include: {
+        membership_levels: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+    });
+
+    if (!membership) return null;
+
+    return {
+      id: membership.id,
+      user_id: membership.user_id,
+      membership_level_id: membership.membership_level_id,
+      start_date: membership.start_date,
+      end_date: membership.end_date,
+      status: membership.status,
+      created_at: membership.created_at,
+      updated_at: membership.updated_at,
+      membership_level: {
+        name: membership.membership_levels.name,
+      },
+    };
+  }
+
+  /**
    * Create a new membership
    */
   static async createMembership(data: CreateMembershipInput) {

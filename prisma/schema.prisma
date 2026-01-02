@@ -132,6 +132,8 @@ model users {
   public_id         String        @unique @default(uuid())
   email             String        @unique
   name              String?
+  profession        String?
+  is_hidden         Boolean       @default(false)
   created_at        DateTime      @default(now())
   updated_at        DateTime      @updatedAt
   password          String?
@@ -147,6 +149,7 @@ model users {
   articles          articles[]
   article_reviews   article_reviews[]
   orders            orders[]
+  email_verification_tokens email_verification_tokens[]
 
   events_created  events[]       
   event_registrations event_registrations[]
@@ -520,6 +523,22 @@ model event_guests {
   registration     event_registrations @relation(fields: [registration_id], references: [id], onDelete: Cascade)
 }
 
+model email_verification_tokens {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  token      String   @unique @default(uuid())
+  type       TokenType @default(EMAIL_VERIFICATION)
+  expires_at DateTime
+  created_at DateTime @default(now())
+  used_at    DateTime?
+  
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([token])
+  @@index([expires_at])
+}
+
 /////////////////////////////
 // EVENT ENUMS
 /////////////////////////////
@@ -536,4 +555,9 @@ enum EventRegistrationStatus {
   PAID
   CANCELLED
   ATTENDED
+}
+
+enum TokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
 }

@@ -788,6 +788,7 @@
       },
       "registration": {
         "title": "Registration",
+        "subtitle": "Complete your registration for this event",
         "loginRequired": "Login required to register",
         "upgradeMembership": "Upgrade Membership",
         "joinMembership": "Join to Membership",
@@ -815,6 +816,7 @@
         "errorTitle": "Registration Error",
         "notFound": "Registration not found",
         "alreadyRegistered": "You have already registered for this event. Check your email for confirmation details.",
+        "alreadyRegisteredMember": "You have already registered for this event. Please check your Profile → My Event Tickets for confirmation details.",
         "success": {
           "title": "Registration Confirmed!",
           "description": "You have successfully registered for this event.",
@@ -1310,6 +1312,7 @@
   "Common": {
     "loading": "Loading...",
     "saving": "Saving...",
+    "uploading": "Uploading...",
     "submit": "Submit",
     "cancel": "Cancel",
     "delete": "Delete",
@@ -1344,6 +1347,146 @@
       "maxLength": "Must be no more than {max} characters",
       "passwordMismatch": "Passwords do not match",
       "error": "An error occurred. Please try again."
+    },
+    "toast": {
+      "error": "Error",
+      "success": "Success",
+      "warning": "Warning",
+      "info": "Information"
+    }
+  },
+  "Lounge": {
+    "welcome": "Welcome to the Lounge",
+    "nav": {
+      "lounge": "Lounge",
+      "articles": "Articles",
+      "events": "Events",
+      "community": "Community",
+      "home": "Home",
+      "logout": "Logout"
+    },
+    "hero": {
+      "membersOnly": "Members Only",
+      "welcomeMessage": "Welcome to the Lounge",
+      "welcomeTitle": "Welcome to the Lounge, {userName}",
+      "description": "Your exclusive space for premium content, community connections, and personalized wellness resources.",
+      "upcomingEvent": "Upcoming Event",
+      "featuredArticle": "Featured Article",
+      "viewEvent": "View Event",
+      "readArticle": "Read Article",
+      "loadingContent": "Loading featured content..."
+    },
+    "articles": {
+      "title": "Exclusive Articles",
+      "description": "Premium content curated just for our members",
+      "viewAll": "View All",
+      "readMore": "Read More",
+      "swipeToSeeMore": "← Swipe to see more →",
+      "pageTitle": "Articles & Resources",
+      "pageDescription": "Access exclusive articles, research, and insights curated for our valued members.",
+      "allCategories": "All Categories",
+      "searchPlaceholder": "Search articles...",
+      "noArticles": "No Articles Found",
+      "noArticlesDescription": "Try adjusting your search or filters."
+    },
+    "events": {
+      "title": "Upcoming Events",
+      "description": "Exclusive events and workshops for our community",
+      "viewAll": "View All",
+      "registerNow": "Register Now",
+      "spotsLeft": "spots left",
+      "swipeToSeeMore": "← Swipe to see more →"
+    },
+    "footer": {
+      "cta": {
+        "title": "Need Support?",
+        "description": "Our team is here to help you make the most of your membership. Get in touch or manage your account.",
+        "contactButton": "Contact Us",
+        "profileButton": "My Profile"
+      },
+      "member": {
+        "title": "Member Area",
+        "lounge": "Lounge",
+        "articles": "Articles",
+        "events": "Events",
+        "community": "Community"
+      },
+      "support": {
+        "title": "Support",
+        "faq": "FAQ",
+        "contact": "Contact",
+        "profile": "My Profile"
+      },
+      "resource": {
+        "title": "Resources",
+        "about": "About Us",
+        "services": "Services",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service"
+      },
+      "copyright": "© 2025 The Hong Kong Menopause Society. All rights reserved."
+    },
+    "comingSoon": {
+      "title": "Coming Soon",
+      "subtitle": "We're Building Something Amazing",
+      "description": "Our community feature is currently under development. Soon you'll be able to connect with fellow members, share experiences, and support each other on your wellness journey.",
+      "notify": "Notify me when it's ready",
+      "backToLounge": "Back to Lounge"
+    },
+    "profile": {
+      "changeProfileSettings": "Change Profile Settings",
+      "eventTickets": "Event Tickets",
+      "orderHistory": "Order History",
+      "notifications": "Notifications",
+      "contactUs": "Contact Us",
+      "settings": "Settings",
+      "logout": "Logout",
+      "noMembership": "No Active Membership",
+      "settingsDescription": "Update your profile information and privacy settings",
+      "profilePhoto": "Profile Photo",
+      "changePhoto": "Change Photo",
+      "photoHint": "JPG, PNG or GIF. Max size 5MB.",
+      "name": "Name",
+      "namePlaceholder": "Enter your name",
+      "profession": "Profession",
+      "professionPlaceholder": "Enter your profession",
+      "professionHint": "Optional. This will be displayed on your profile.",
+      "emailCannotChange": "Email address cannot be changed",
+      "hideProfile": "Hide my profile in comments and activities",
+      "hideProfileDescription": "When enabled, your name will be hidden when you comment or participate in activities for privacy.",
+      "saveChanges": "Save Changes",
+      "settingsUpdated": "Profile settings updated successfully",
+      "settingsUpdateFailed": "Failed to update profile settings",
+      "invalidImageType": "Invalid file type. Only images are allowed.",
+      "imageTooLarge": "File too large. Maximum size is 5MB.",
+      "photoUpdated": "Profile photo updated successfully",
+      "photoUpdateFailed": "Failed to update profile photo",
+      "privacy": {
+        "title": "Privacy & Security",
+        "description": "Manage your email verification and password settings",
+        "emailVerification": "Email Verification",
+        "emailVerificationDescription": "Verify your email address to secure your account and receive important notifications",
+        "verified": "Verified",
+        "notVerified": "Not Verified",
+        "sendVerification": "Send Verification Email",
+        "verificationSent": "Verification email sent! Please check your inbox",
+        "verificationFailed": "Failed to send verification email",
+        "changePassword": "Change Password",
+        "changePasswordDescription": "Update your password to keep your account secure",
+        "currentPassword": "Current Password",
+        "currentPasswordPlaceholder": "Enter your current password",
+        "newPassword": "New Password",
+        "newPasswordPlaceholder": "Enter your new password",
+        "confirmPassword": "Confirm New Password",
+        "confirmPasswordPlaceholder": "Confirm your new password",
+        "passwordHint": "Password must be at least 8 characters long",
+        "updatePassword": "Update Password",
+        "passwordChanged": "Password changed successfully",
+        "passwordChangeFailed": "Failed to change password",
+        "passwordMismatch": "Passwords do not match",
+        "passwordTooShort": "Password must be at least 8 characters",
+        "fillAllFields": "Please fill in all fields"
+      }
     }
   }
 }

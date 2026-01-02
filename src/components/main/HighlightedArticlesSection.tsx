@@ -179,19 +179,19 @@ export function HighlightedArticlesSection() {
               {/* Previous Button */}
               <button
                 onClick={handlePrevious}
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-20 rounded-full bg-white/90 p-3 shadow-lg backdrop-blur transition hover:bg-white hover:scale-110"
+                className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 z-20 group/btn rounded-full bg-gradient-to-br from-white via-white to-gray-50 p-3 md:p-4 shadow-xl backdrop-blur-sm border border-white/20 transition-all duration-300 hover:shadow-2xl hover:scale-110 hover:-translate-x-1 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-black/20"
                 aria-label="Previous article"
               >
-                <ChevronLeft className="h-6 w-6 text-gray-900" />
+                <ChevronLeft className="h-5 w-5 md:h-6 md:w-6 text-gray-900 transition-transform duration-300 group-hover/btn:-translate-x-0.5" />
               </button>
 
               {/* Next Button */}
               <button
                 onClick={handleNext}
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-20 rounded-full bg-white/90 p-3 shadow-lg backdrop-blur transition hover:bg-white hover:scale-110"
+                className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 group/btn rounded-full bg-gradient-to-br from-white via-white to-gray-50 p-3 md:p-4 shadow-xl backdrop-blur-sm border border-white/20 transition-all duration-300 hover:shadow-2xl hover:scale-110 hover:translate-x-1 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-black/20"
                 aria-label="Next article"
               >
-                <ChevronRight className="h-6 w-6 text-gray-900" />
+                <ChevronRight className="h-5 w-5 md:h-6 md:w-6 text-gray-900 transition-transform duration-300 group-hover/btn:translate-x-0.5" />
               </button>
 
               {/* Dots Indicator */}

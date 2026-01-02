@@ -47,10 +47,11 @@ export function useAuthActions() {
       }
 
       // Redirect based on role
-      if (userData.role === 'Administrator' || userData.role === 'Moderator') {
+      if (userData.role === 'Administrator') {
         router.push('/dashboard');
       } else {
-        router.push('/');
+        // All other users including members go to lounge
+        router.push('/member/lounge');
       }
       
       router.refresh();
@@ -121,7 +122,7 @@ export function useAuthActions() {
       }
 
       // Redirect to membership page for new free members
-      router.push('/');
+      router.push('/member/lounge');
       router.refresh();
       return { success: true };
     } catch (err: any) {

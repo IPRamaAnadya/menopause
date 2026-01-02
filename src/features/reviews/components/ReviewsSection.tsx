@@ -44,16 +44,16 @@ export function ReviewsSection({ articleId }: ReviewsSectionProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-2xl font-bold flex items-center gap-2">
+        <h3 className="text-xl md:text-2xl font-bold flex items-center gap-2">
           {/* <MessageSquare className="h-6 w-6" /> */}
           {t('title')} {total > 0 && `(${total})`}
         </h3>
       </div>
 
       {/* Review Form */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
+      <div className="rounded-lg border border-gray-200 bg-white p-4 md:p-6">
         <h4 className="font-semibold mb-4">{t('writeReview')}</h4>
         <ReviewForm articleId={articleId} onSuccess={refresh} />
       </div>
@@ -67,7 +67,7 @@ export function ReviewsSection({ articleId }: ReviewsSectionProps) {
       ) : (
         <div className="space-y-4">
           {reviews.map((review) => (
-            <div key={review.id} className="rounded-lg border border-gray-200 bg-white p-6">
+            <div key={review.id} className="rounded-lg border border-gray-200 bg-white p-4 md:p-6">
               <ReviewItem review={review} articleId={articleId} onUpdate={refresh} />
             </div>
           ))}
